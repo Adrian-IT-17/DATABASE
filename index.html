@@ -1,0 +1,1787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f4f1eb" id="meta-theme-color">
+<title>IT0009 — Database Systems Reviewer</title>
+<style>
+:root {
+  --border: #e0d9cc;
+  --surface: #fffef9;
+  --surface2: #f4f1eb;
+  --blue: #2f6bc8;
+  --bg: #f4f1eb;
+  --card: #fffef9;
+  --card-border: #e0d9cc;
+  --card-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  --text: #1a1714;
+  --header: #0f0d0b;
+  --accent: #c84b2f;
+  --accent2: #2f6bc8;
+  --muted: #7a7168;
+  --green: #2a7d4f;
+  --green-bg: #eaf5ef;
+  --green-border: #a8d5bc;
+  --red: #c84b2f;
+  --red-bg: #fdf0ec;
+  --red-border: #f0b8ac;
+  --yellow: #d4891a;
+  --yellow-bg: #fef8ec;
+  --mono: 'Courier New', Courier, monospace;
+  --radius: 10px;
+}
+[data-theme="dark"],[data-dark]{
+  --border:#2e2a24;--surface:#1c1916;--surface2:#12100e;--blue:#5b96e8;
+  --bg:#12100e;--card:#1c1916;--card-border:#2e2a24;--card-shadow:0 2px 12px rgba(0,0,0,0.3);
+  --text:#e8e2d8;--header:#f2ece0;--accent:#e06448;--accent2:#5b96e8;--muted:#8a8178;
+  --green:#4caf7d;--green-bg:#0e2419;--green-border:#1e5035;
+  --red:#e06448;--red-bg:#2a100a;--red-border:#6b2518;--yellow:#e8a830;--yellow-bg:#1e1608;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Georgia,'Times New Roman',serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .3s,color .3s;}
+a{color:var(--accent2);}
+.view{display:none;}.view.active{display:block;}
+#v-module.active{display:flex;}
+#v-flashcards.active{display:flex;}
+
+/* TOPBAR */
+.topbar{background:var(--card);padding:0 20px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;border-bottom:2px solid transparent;border-image:linear-gradient(90deg,var(--accent),var(--blue),var(--accent)) 1;}
+.topbar-title{font-size:14px;font-weight:bold;color:var(--header);letter-spacing:.5px;}
+.topbar-actions{display:flex;gap:8px;align-items:center;}
+.btn{padding:7px 14px;border-radius:6px;border:1px solid var(--card-border);background:var(--card);color:var(--text);font-size:13px;cursor:pointer;font-family:inherit;transition:all .15s;}
+.btn:hover{border-color:var(--accent);color:var(--accent);}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+.btn-primary:hover{background:#a83820;color:#fff;border-color:#a83820;}
+.btn-sm{padding:4px 10px;font-size:12px;}
+.btn-ghost{border-color:transparent;background:transparent;color:var(--muted);}
+.btn-ghost:hover{color:var(--header);background:var(--surface2);}
+.btn:focus-visible,.modal-close:focus-visible,.segment-btn:focus-visible,.opt-btn:focus-visible,.nav-cell:focus-visible,.q-flag:focus-visible,.reviewer-card:focus-visible{outline:2px solid var(--accent2);outline-offset:2px;}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;}}
+
+/* HOME */
+#v-home{padding-bottom:56px;}
+.home-inner{max-width:720px;margin:0 auto;padding:0 24px;}
+.home-hero{text-align:center;padding:52px 0 36px;}
+.home-hero h1{font-size:clamp(26px,5vw,34px);color:var(--header);letter-spacing:-.03em;margin-bottom:10px;font-weight:700;}
+.home-hero p{color:var(--muted);font-size:15px;line-height:1.55;max-width:36em;margin:0 auto;}
+.stats-row{display:flex;gap:10px;justify-content:stretch;flex-wrap:wrap;padding:0 0 32px;}
+.stat-box{background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:18px 14px;text-align:center;flex:1;min-width:calc(50% - 8px);}
+@media(min-width:540px){.stat-box{min-width:140px;}}
+.stat-box .stat-val{font-size:24px;font-weight:bold;color:var(--accent);font-family:var(--mono);line-height:1.2;}
+.stat-box .stat-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:6px;}
+.cards-grid{display:grid;grid-template-columns:1fr;gap:14px;}
+@media(min-width:560px){.cards-grid{grid-template-columns:repeat(2,1fr);gap:16px;}}
+.reviewer-card{position:relative;background:var(--card);border:1px solid var(--card-border);border-radius:14px;padding:22px 22px 20px;cursor:pointer;transition:border-color .2s,box-shadow .2s;box-shadow:var(--card-shadow);overflow:hidden;border-left:3px solid var(--card-border);}
+.reviewer-card[data-part="I"]{border-left-color:var(--accent);}
+.reviewer-card[data-part="II"]{border-left-color:var(--blue);}
+.reviewer-card[data-part="III"]{border-left-color:var(--yellow);}
+.reviewer-card[data-part="IV"]{border-left-color:var(--green);}
+.reviewer-card[data-part="ALL"]{border-left-color:var(--muted);}
+.reviewer-card[data-part="mod"]{border-left-color:var(--accent2);}
+.reviewer-card[data-part="fc"]{border-left-color:var(--green);}
+.reviewer-card::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:.35;background-image:radial-gradient(circle,var(--border) 1px,transparent 1px);background-size:20px 20px;}
+.reviewer-card:hover{border-color:var(--accent);box-shadow:0 8px 28px rgba(0,0,0,.08);}
+[data-theme="dark"] .reviewer-card:hover,[data-dark] .reviewer-card:hover{box-shadow:0 8px 28px rgba(0,0,0,.35);}
+.part-card-bar{height:4px;border-radius:3px;background:var(--surface2);overflow:hidden;margin-bottom:14px;position:relative;z-index:1;}
+.part-card-bar>i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--green),var(--blue));border-radius:3px;transition:width .35s ease;}
+.card-title{font-size:17px;font-weight:700;color:var(--header);margin-bottom:6px;letter-spacing:-.02em;position:relative;z-index:1;}
+.card-sub{font-size:13px;color:var(--muted);margin-bottom:0;line-height:1.5;position:relative;z-index:1;}
+.card-footer{margin-top:16px;padding-top:14px;border-top:1px solid var(--card-border);position:relative;z-index:1;}
+.part-card-meta{font-size:12px;color:var(--muted);font-family:var(--mono);letter-spacing:.02em;}
+.pill{background:var(--bg);border:1px solid var(--card-border);border-radius:20px;padding:3px 10px;font-size:12px;color:var(--muted);font-family:var(--mono);}
+.badge{border-radius:20px;padding:3px 10px;font-size:12px;font-weight:bold;}
+.badge-none{background:#eee;color:#999;}[data-theme="dark"] .badge-none,[data-dark] .badge-none{background:#2a2520;color:#666;}
+.badge-good{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);}
+.badge-mid{background:var(--yellow-bg);color:var(--yellow);border:1px solid #f0d090;}
+.badge-bad{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border);}
+.history-section{padding:8px 0 0;margin-top:8px;}
+.history-section h3{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px;}
+.home-topic-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px 16px;margin:0 0 28px;padding:16px 18px;background:var(--card);border:1px solid var(--card-border);border-radius:12px;text-align:center;}
+.home-topic-row .home-topic-copy{flex:1 1 100%;margin:0;font-size:13px;color:var(--muted);line-height:1.5;max-width:32em;margin-left:auto;margin-right:auto;}
+.history-bar-wrap{background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:18px;min-height:88px;}
+.history-bars{display:flex;gap:4px;align-items:flex-end;height:60px;}
+.hbar{flex:1;background:var(--accent);border-radius:3px 3px 0 0;min-height:4px;opacity:.7;transition:opacity .2s;cursor:pointer;position:relative;}
+.hbar:hover{opacity:1;}
+.hbar-tip{position:absolute;bottom:calc(100%+4px);left:50%;transform:translateX(-50%);background:#333;color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;white-space:nowrap;pointer-events:none;display:none;}
+.hbar:hover .hbar-tip{display:block;}
+.no-history{color:var(--muted);font-size:13px;font-style:italic;text-align:center;padding:10px;}
+
+/* TOPICS */
+#v-topics{padding-bottom:48px;}
+.topics-inner{max-width:720px;margin:0 auto;padding:0 24px;}
+.topics-header{padding:20px 0 16px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.topics-header h2{flex:1 1 100%;font-size:20px;color:var(--header);letter-spacing:-.02em;margin-bottom:4px;}
+.topic-list{padding:0;}
+.topic-item{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+.topic-item label{flex:1;cursor:pointer;display:flex;flex-direction:column;gap:4px;}
+.topic-name{font-size:14px;font-weight:bold;}
+.topic-prog-bar{height:6px;background:var(--bg);border-radius:3px;overflow:hidden;}
+.topic-prog-fill{height:100%;border-radius:3px;transition:width .3s;}
+.prog-strong{background:var(--green);}.prog-fair{background:var(--yellow);}.prog-weak{background:var(--red);}.prog-none{background:var(--card-border);}
+.topic-badge{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:bold;}
+.tb-strong{background:var(--green-bg);color:var(--green);}.tb-fair{background:var(--yellow-bg);color:var(--yellow);}.tb-weak{background:var(--red-bg);color:var(--red);}.tb-none{background:var(--bg);color:var(--muted);border:1px solid var(--card-border);}
+.topic-stat{font-size:12px;color:var(--muted);font-family:var(--mono);}
+.topic-type-section{margin:24px 0 8px;padding:16px 0 0;border-top:1px solid var(--card-border);}
+.topic-type-heading{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:0 0 6px;}
+.topic-type-hint{font-size:12px;color:var(--muted);margin:0 0 12px;line-height:1.45;}
+.topic-type-filters{display:flex;flex-wrap:wrap;gap:8px 14px;}
+.topic-type-chip{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--text);cursor:pointer;user-select:none;padding:8px 12px;border-radius:10px;border:1px solid var(--card-border);background:var(--surface);}
+.topic-type-chip input{accent-color:var(--accent);width:16px;height:16px;cursor:pointer;margin:0;}
+.mode-buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:20px 0 0;}
+.mode-btn{padding:12px 14px;border-radius:10px;border:1px solid var(--card-border);background:var(--card);color:var(--text);font-size:13px;cursor:pointer;text-align:center;font-family:inherit;transition:all .15s;}
+.mode-btn:hover{border-color:var(--accent);color:var(--accent);}
+.mode-btn.full{grid-column:1/-1;}
+.mode-btn:disabled,.segment-btn:disabled{opacity:.45;cursor:not-allowed;}
+
+/* QUIZ */
+#v-quiz{display:none;flex-direction:column;height:100vh;overflow:hidden;}
+#v-quiz.active{display:flex;}
+.quiz-shell{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden;}
+.quiz-topbar{flex-shrink:0;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:var(--card);border-bottom:2px solid transparent;border-image:linear-gradient(90deg,var(--accent),var(--blue),var(--accent)) 1;}
+.quiz-topbar-title{font-size:14px;font-weight:bold;color:var(--header);}
+.quiz-main{flex:1;display:flex;flex-direction:row;min-height:0;overflow:hidden;height:calc(100vh - 56px);}
+.quiz-body{flex:1;min-width:0;min-height:0;overflow-y:auto;padding:24px 28px;display:flex;flex-direction:column;gap:18px;}
+.quiz-right{width:220px;border-left:1px solid var(--card-border);padding:20px 18px;overflow-y:auto;flex-shrink:0;background:var(--bg);}
+.q-header{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+.q-meta{font-size:12px;color:var(--muted);font-family:var(--mono);}
+.q-flag{background:none;border:none;font-size:18px;cursor:pointer;opacity:.4;transition:opacity .2s;}
+.q-flag.flagged{opacity:1;}
+.q-text{font-size:17px;line-height:1.8;letter-spacing:-.2px;color:var(--header);}
+.quiz-progress-track{height:8px;background:var(--bg);border-radius:4px;overflow:hidden;border:1px solid var(--card-border);}
+.quiz-progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;width:0%;transition:width .25s ease;}
+.quiz-progress-label{font-size:11px;color:var(--muted);padding:4px 0;}
+.code-block{background:#1e1e2e;color:#cdd6f4;padding:16px;border-radius:8px;font-family:var(--mono);font-size:13px;line-height:1.6;overflow-x:auto;position:relative;}
+.code-block:before{content:'● ● ●';position:absolute;top:8px;left:12px;color:#6c7086;font-size:10px;letter-spacing:3px;}
+.code-block pre{margin-top:12px;}
+.opts-list{display:flex;flex-direction:column;gap:10px;}
+.opt-btn{padding:14px 18px;border-radius:10px;border:1.5px solid var(--card-border);border-left-width:4px;border-left-color:transparent;background:var(--card);color:var(--text);font-size:14px;cursor:pointer;text-align:left;font-family:inherit;transition:all .15s;line-height:1.45;}
+.opt-btn:hover:not(:disabled){border-color:var(--accent2);border-left-color:var(--blue);background:var(--bg);}
+.opt-btn.correct{border-color:var(--green);border-left-color:var(--green);background:var(--green-bg);color:var(--green);}
+.opt-btn.wrong{border-color:var(--red);border-left-color:var(--red);background:var(--red-bg);color:var(--red);}
+#q-area{min-height:220px;flex-shrink:0;}
+.opt-btn:disabled{cursor:default;}
+.text-input-wrap{display:flex;flex-direction:column;gap:10px;}
+.text-input-wrap input{padding:12px 16px;border-radius:8px;border:1.5px solid var(--card-border);background:var(--card);color:var(--text);font-size:15px;font-family:Georgia,serif;outline:none;transition:border-color .2s;}
+.text-input-wrap input:focus{border-color:var(--accent2);}
+.text-input-wrap input.correct{border-color:var(--green);background:var(--green-bg);}
+.text-input-wrap input.wrong{border-color:var(--red);background:var(--red-bg);}
+.hint-btn{align-self:flex-start;padding:6px 14px;border-radius:6px;border:1px dashed var(--yellow);background:var(--yellow-bg);color:var(--yellow);font-size:13px;cursor:pointer;font-family:inherit;}
+.hint-box{background:var(--yellow-bg);border:1px solid #f0d090;border-radius:6px;padding:8px 12px;font-size:13px;color:var(--yellow);}
+.feedback-box{border-radius:8px;padding:14px 16px;font-size:14px;line-height:1.6;}
+.feedback-box.correct{background:var(--green-bg);border:1px solid var(--green-border);color:var(--green);}
+.feedback-box.wrong{background:var(--red-bg);border:1px solid var(--red-border);color:var(--red);}
+.feedback-box .fb-label{font-weight:bold;margin-bottom:4px;}
+.feedback-box .fb-ans{font-style:italic;margin-bottom:6px;}
+.feedback-box .fb-ex{color:var(--text);opacity:.85;}
+.quiz-nav{display:flex;gap:10px;flex-wrap:wrap;position:sticky;bottom:0;margin-top:auto;padding-top:16px;background:var(--bg);z-index:6;}
+.quiz-nav .btn{min-height:40px;padding:8px 16px;}
+.sidebar-score{text-align:center;margin-bottom:16px;}
+.sidebar-score .sc-frac{font-size:24px;font-weight:bold;font-family:var(--mono);color:var(--header);}
+.sidebar-score .sc-pct{font-size:13px;color:var(--muted);}
+.nav-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;}
+.nav-cell{width:100%;aspect-ratio:1;border-radius:5px;border:none;font-size:11px;cursor:pointer;font-family:var(--mono);transition:all .12s;}
+.nc-default{background:var(--bg);color:var(--muted);border:1px solid var(--card-border);}
+.nc-current{background:var(--accent2);color:#fff;}
+.nc-correct{background:var(--green);color:#fff;}
+.nc-wrong{background:var(--red);color:#fff;}
+.nc-flagged::after{content:'';position:absolute;top:2px;right:2px;width:5px;height:5px;background:var(--yellow);border-radius:50%;}
+.nc-flagged{position:relative;}
+.timer-box{text-align:center;margin-bottom:12px;padding:8px;border-radius:8px;background:var(--bg);font-family:var(--mono);font-size:18px;font-weight:bold;}
+.timer-warn{background:var(--yellow-bg);color:var(--yellow);}
+.timer-crit{background:var(--red-bg);color:var(--red);}
+kbd{display:inline-block;padding:1px 6px;border:1px solid var(--border);border-radius:4px;font-family:var(--mono);font-size:11px;background:var(--surface2);}
+.sidebar-kbd{margin-top:18px;padding-top:14px;border-top:1px solid var(--card-border);font-size:10px;color:var(--muted);line-height:1.5;}
+.sidebar-kbd kbd{font-size:10px;padding:1px 5px;}
+.confidence-row{display:none;margin-top:12px;padding-top:12px;border-top:1px dashed var(--card-border);}
+.confidence-row.visible{display:block;}
+
+/* RESULT */
+#v-result{padding:0 0 48px;text-align:center;}
+.result-inner{max-width:520px;margin:0 auto;padding:40px 22px 20px;}
+.score-ring-wrap{position:relative;width:160px;height:160px;margin:0 auto 24px;}
+.score-ring-wrap svg{transform:rotate(-90deg);}
+.score-ring-wrap.ring-glow-high svg{filter:drop-shadow(0 0 8px rgba(30,122,72,.4));}
+.score-ring-wrap.ring-glow-low svg{filter:drop-shadow(0 0 8px rgba(192,48,32,.3));}
+.score-ring-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;}
+.score-ring-val .pct{font-size:32px;font-weight:bold;color:var(--header);}
+.score-ring-val .label{font-size:12px;color:var(--muted);}
+.result-stats{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+.result-stat{background:var(--card);border:1px solid var(--card-border);border-radius:8px;padding:14px 20px;text-align:center;}
+.result-stat .val{font-size:22px;font-weight:bold;font-family:var(--mono);}
+.result-stat .lbl{font-size:12px;color:var(--muted);}
+.result-parts{margin:20px 0;text-align:left;max-width:420px;margin-left:auto;margin-right:auto;}
+.result-parts h4{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;}
+.result-parts ul{list-style:none;font-size:13px;color:var(--text);}
+.result-parts li{padding:4px 0;border-bottom:1px solid var(--card-border);}
+.session-table-wrap{max-height:240px;overflow-y:auto;margin:16px auto 0;text-align:left;border:1px solid var(--card-border);border-radius:8px;}
+.session-table{width:100%;font-size:12px;border-collapse:collapse;}
+.session-table th,.session-table td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--card-border);}
+.session-table th{background:var(--bg);color:var(--muted);font-weight:600;}
+.session-table tbody tr:nth-child(even){background:var(--surface2);}
+.result-buttons{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:28px;}
+
+/* REVIEW */
+#v-review{padding-bottom:40px;}
+.review-item{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:18px;margin:12px 20px;}
+.review-item.ri-correct{border-left:4px solid var(--green);}
+.review-item.ri-wrong{border-left:4px solid var(--red);}
+.review-q{font-size:14px;line-height:1.6;margin-bottom:10px;}
+.review-ans{font-size:13px;margin-bottom:6px;}
+.review-ex{font-size:13px;color:var(--muted);font-style:italic;}
+
+/* ═══════════════ FLASHCARDS ═══════════════ */
+#v-flashcards{flex-direction:column;}
+#v-flashcards>.topbar{position:sticky;top:0;flex-shrink:0;}
+.fc-body{flex:1;min-height:0;overflow-y:auto;padding:20px 16px 60px;display:flex;flex-direction:column;align-items:center;gap:16px;}
+.fc-max{width:100%;max-width:620px;}
+
+/* filter tabs */
+.fc-tabs{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;}
+.fc-tab{padding:5px 14px;border-radius:20px;border:1px solid var(--card-border);background:var(--card);font-size:12px;cursor:pointer;font-family:inherit;color:var(--muted);transition:all .15s;}
+.fc-tab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.fc-tab:hover:not(.active){border-color:var(--accent);color:var(--accent);}
+
+/* progress */
+.fc-progress-wrap{width:100%;}
+.fc-progress-label{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:5px;font-family:var(--mono);}
+.fc-progress-track{height:5px;background:var(--card-border);border-radius:3px;overflow:hidden;}
+.fc-progress-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .4s ease;}
+
+/* stats strip */
+.fc-stats{display:flex;gap:8px;width:100%;}
+.fc-stat{background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:10px 12px;text-align:center;flex:1;}
+.fc-stat .fsv{font-size:18px;font-weight:bold;font-family:var(--mono);}
+.fc-stat .fsl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:2px;}
+.fc-stat.s-know .fsv{color:var(--green);}
+.fc-stat.s-almost .fsv{color:var(--yellow);}
+.fc-stat.s-nope .fsv{color:var(--red);}
+
+/* card flip */
+.fc-scene{width:100%;perspective:1200px;}
+.fc-card-wrap{width:100%;min-height:240px;position:relative;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.4,0,.2,1);cursor:pointer;}
+.fc-card-wrap.flipped{transform:rotateY(180deg);}
+.fc-face{position:absolute;inset:0;background:var(--card);border:1px solid var(--card-border);border-radius:14px;padding:28px 24px;display:flex;flex-direction:column;justify-content:center;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:var(--card-shadow);min-height:240px;}
+.fc-face.fc-back{transform:rotateY(180deg);}
+.fc-face-label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px;font-family:var(--mono);}
+.fc-face-label.back{color:var(--accent);}
+.fc-card-num{position:absolute;top:14px;right:16px;font-size:11px;color:var(--muted);font-family:var(--mono);}
+.fc-topic-tag{display:inline-block;font-size:11px;padding:2px 9px;border-radius:10px;background:var(--bg);border:1px solid var(--card-border);color:var(--muted);margin-bottom:10px;}
+.fc-question{font-size:17px;line-height:1.7;color:var(--header);}
+.fc-answer{font-size:19px;font-weight:bold;color:var(--accent);line-height:1.45;margin-bottom:10px;}
+.fc-explanation{font-size:13px;color:var(--muted);line-height:1.6;font-style:italic;}
+.fc-flip-hint{font-size:12px;color:var(--muted);text-align:center;font-style:italic;}
+
+/* rating buttons */
+.fc-rating{display:flex;gap:10px;width:100%;}
+.fc-rate-btn{flex:1;padding:11px;border-radius:10px;border:1.5px solid var(--card-border);background:var(--card);font-size:13px;cursor:pointer;font-family:inherit;transition:all .18s;text-align:center;}
+.fc-rate-btn.know{border-color:var(--green-border);color:var(--green);}
+.fc-rate-btn.know:hover:not(:disabled){background:var(--green-bg);}
+.fc-rate-btn.almost{border-color:#f0d090;color:var(--yellow);}
+.fc-rate-btn.almost:hover:not(:disabled){background:var(--yellow-bg);}
+.fc-rate-btn.nope{border-color:var(--red-border);color:var(--red);}
+.fc-rate-btn.nope:hover:not(:disabled){background:var(--red-bg);}
+.fc-rate-btn:disabled{opacity:.35;cursor:default;}
+.fc-rate-btn.selected-rating{font-weight:bold;transform:scale(1.04);}
+
+/* nav */
+.fc-nav{display:flex;gap:8px;width:100%;justify-content:space-between;align-items:center;}
+
+/* complete screen */
+.fc-complete{text-align:center;padding:36px 20px;background:var(--card);border:1px solid var(--card-border);border-radius:14px;width:100%;}
+.fc-complete h2{font-size:22px;color:var(--header);margin-bottom:8px;}
+.fc-complete p{color:var(--muted);font-size:14px;margin-bottom:18px;line-height:1.5;}
+.fc-complete-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+
+/* MODULE */
+#v-module{flex-direction:column;}
+#v-module .topbar{position:sticky;top:0;flex-shrink:0;}
+.module-content{flex:1;min-height:0;overflow-y:auto;padding:0 0 60px;}
+.mod-cover{background:linear-gradient(135deg,#1a0f0a 0%,#2a1510 50%,#0a1020 100%);color:#f0e8d8;padding:60px 40px;text-align:center;}
+.mod-cover h1{font-size:36px;letter-spacing:-1px;margin-bottom:8px;}
+.mod-cover p{color:#a09080;font-size:16px;font-style:italic;}
+.mod-pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:20px;}
+.mod-pill{padding:4px 14px;border-radius:20px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);font-size:12px;color:#c8bfb0;}
+.mod-toc{padding:24px 40px;background:var(--card);border-bottom:1px solid var(--card-border);}
+.mod-toc h2{font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;}
+.mod-toc ol{padding-left:20px;}
+.mod-toc li{padding:3px 0;font-size:14px;}
+.mod-toc a{color:var(--accent2);text-decoration:none;}
+.mod-toc a:hover{text-decoration:underline;}
+.mod-section{padding:32px 40px;border-bottom:1px solid var(--card-border);}
+.mod-section h2{font-size:22px;color:var(--header);margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.mod-section h2 .sec-num{font-size:13px;background:var(--accent);color:#fff;padding:2px 8px;border-radius:12px;font-family:var(--mono);}
+.analogy-box{background:var(--yellow-bg);border-left:4px solid var(--yellow);padding:14px 16px;border-radius:0 8px 8px 0;margin-bottom:16px;font-size:14px;line-height:1.65;}
+.analogy-box strong{color:var(--yellow);display:block;margin-bottom:4px;font-size:12px;text-transform:uppercase;letter-spacing:.6px;}
+.mod-para{font-size:15px;line-height:1.75;color:var(--text);margin-bottom:14px;}
+.mod-code{background:#1e1e2e;color:#cdd6f4;padding:20px;border-radius:8px;font-family:var(--mono);font-size:13px;line-height:1.7;overflow-x:auto;margin-bottom:16px;position:relative;}
+.mod-code:before{content:'● ● ●';position:absolute;top:8px;left:14px;color:#6c7086;font-size:10px;letter-spacing:3px;}
+.mod-code pre{margin-top:14px;}
+.key-points{list-style:none;padding:0;margin-bottom:14px;}
+.key-points li{padding:6px 0 6px 22px;position:relative;font-size:14px;line-height:1.5;border-bottom:1px solid var(--bg);}
+.key-points li:before{content:'→';position:absolute;left:0;color:var(--accent);}
+.key-points li:last-child{border-bottom:none;}
+.mod-table{width:100%;border-collapse:collapse;margin-bottom:16px;font-size:14px;}
+.mod-table th{background:var(--bg);padding:10px 14px;text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);border-bottom:2px solid var(--card-border);}
+.mod-table td{padding:10px 14px;border-bottom:1px solid var(--card-border);}
+.mod-table tr:last-child td{border-bottom:none;}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);backdrop-filter:blur(8px);z-index:200;display:none;align-items:center;justify-content:center;padding:24px 16px;}
+.modal-overlay.open{display:flex;}
+.modal-box{background:var(--card);border-radius:16px;max-width:400px;width:100%;max-height:88vh;overflow-y:auto;padding:26px 24px 22px;box-shadow:0 24px 80px rgba(0,0,0,.35),0 0 0 1px var(--border);}
+.modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:18px;}
+.modal-head h3{font-size:19px;color:var(--header);letter-spacing:-.02em;line-height:1.25;margin:0;flex:1;}
+.modal-close{width:36px;height:36px;border:none;border-radius:10px;background:var(--surface2);color:var(--muted);font-size:22px;line-height:1;cursor:pointer;font-family:inherit;flex-shrink:0;transition:background .15s,color .15s;}
+.modal-close:hover{background:var(--border);color:var(--header);}
+.segment-row{display:flex;gap:0;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:20px;}
+.segment-btn{flex:1;padding:10px 6px;font-size:11px;line-height:1.25;border:none;background:var(--surface);color:var(--text);cursor:pointer;transition:background .15s;font-family:inherit;}
+.segment-btn.active{background:var(--accent);color:#fff;}
+@media(max-width:400px){.segment-row{flex-wrap:wrap;overflow:visible;gap:6px;padding:6px;background:var(--surface2);border-radius:10px;}.segment-btn{flex:1 1 30%;border-radius:8px;border:1px solid var(--border);}}
+.modal-field{margin-bottom:18px;}
+.modal-label{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
+.modal-select{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--card-border);background:var(--card);color:var(--text);font-size:14px;font-family:inherit;cursor:pointer;}
+.modal-toggles{display:flex;flex-direction:column;gap:10px;margin-bottom:8px;}
+.modal-toggles .toggle-row{margin:0;}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--card-border);border-radius:8px;padding:12px 16px;}
+.toggle-label{font-size:14px;}
+.toggle{position:relative;width:44px;height:24px;}
+.toggle input{opacity:0;width:0;height:0;}
+.slider{position:absolute;cursor:pointer;inset:0;background:#ccc;border-radius:24px;transition:.3s;}
+.slider:before{content:'';position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s;}
+input:checked+.slider{background:var(--accent);}
+input:checked+.slider:before{transform:translateX(20px);}
+.modal-weak-hint{font-size:12px;color:var(--muted);text-align:center;margin:12px 0 0;line-height:1.45;display:none;}
+.modal-weak-hint.show{display:block;}
+.modal-footer-btns{display:flex;gap:12px;margin-top:22px;align-items:center;}
+.modal-footer-btns .modal-cancel-btn{flex:0;}
+.modal-footer-btns .modal-start-btn{flex:1;padding:12px 20px;font-size:15px;border-radius:10px;}
+.conf-select{margin-top:6px;max-width:220px;}
+.conf-label{display:block;font-size:11px;color:var(--muted);margin-bottom:6px;}
+
+/* Toast */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:24px;font-size:13px;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;}
+.toast.show{opacity:1;}
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--card-border);border-radius:3px;}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+@media(max-width:600px){
+  .quiz-right{display:none;}.quiz-body{padding:20px 18px;}
+  .mod-section{padding:24px 20px;}.mod-cover{padding:40px 20px;}.mod-toc{padding:20px;}
+  .fc-rating{flex-direction:column;}.fc-rate-btn{width:100%;}
+}
+</style>
+</head>
+<body>
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+<!-- LAUNCH MODAL -->
+<div class="modal-overlay" id="launch-modal" role="dialog" aria-modal="true" aria-labelledby="launch-modal-title" aria-hidden="true" onclick="if(event.target===this)closeLaunchModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <h3 id="launch-modal-title">Part</h3>
+      <button type="button" class="modal-close" onclick="closeLaunchModal()" aria-label="Close">×</button>
+    </div>
+    <div class="segment-row" id="launch-segments"></div>
+    <div class="modal-field">
+      <label class="modal-label" for="modal-session-type">Session type</label>
+      <select id="modal-session-type" class="modal-select" onchange="syncModalWeakUi()">
+        <option value="practice">Practice</option>
+        <option value="weak">Weak spots only</option>
+        <option value="exam">Timed exam (45 min)</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label" for="modal-q-count">Questions: <strong id="modal-q-count-lbl">20</strong></label>
+      <input type="range" id="modal-q-count" min="1" max="60" value="20" oninput="document.getElementById('modal-q-count-lbl').textContent=this.value">
+    </div>
+    <div class="modal-toggles">
+      <div class="toggle-row">
+        <span class="toggle-label">Shuffle order</span>
+        <label class="toggle"><input type="checkbox" id="modal-shuffle" checked><span class="slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">Auto-advance MC (1.5s)</span>
+        <label class="toggle"><input type="checkbox" id="modal-auto-advance" onchange="onAutoAdvanceToggle(this)"><span class="slider"></span></label>
+      </div>
+    </div>
+    <p class="modal-weak-hint" id="modal-weak-hint">Answer some questions first to use weak mode.</p>
+    <div class="modal-footer-btns">
+      <button type="button" class="btn btn-ghost modal-cancel-btn" onclick="closeLaunchModal()">Cancel</button>
+      <button type="button" class="btn btn-primary modal-start-btn" id="modal-start-btn" onclick="launchQuizFromModal()">Start</button>
+    </div>
+  </div>
+</div>
+
+<!-- HOME -->
+<div class="view active" id="v-home">
+  <div class="topbar">
+    <span class="topbar-title">IT0009 Reviewer</span>
+    <div class="topbar-actions">
+      <button type="button" class="btn btn-sm btn-ghost" onclick="toggleTheme()">Theme</button>
+      <button type="button" class="btn btn-sm" onclick="clearAll()">Reset</button>
+    </div>
+  </div>
+  <div class="home-inner">
+    <div class="home-hero">
+      <h1>Database systems</h1>
+      <p>Practice by part, track weak spots, and review when you finish.</p>
+    </div>
+    <div class="home-topic-row">
+      <p class="home-topic-copy">Want to choose modules (PL/SQL, mining, etc.) instead of exam parts?</p>
+      <button type="button" class="btn" onclick="showTopics('EXAM')">Topic picker</button>
+    </div>
+    <div class="stats-row" id="home-stats"></div>
+    <div class="cards-grid" id="home-cards"></div>
+    <div class="history-section">
+      <h3>Recent scores</h3>
+      <div class="history-bar-wrap" id="history-chart"></div>
+    </div>
+  </div>
+</div>
+
+<!-- TOPICS -->
+<div class="view" id="v-topics">
+  <div class="topbar">
+    <span class="topbar-title" id="topics-title">Topics</span>
+    <button type="button" class="btn btn-sm btn-ghost" onclick="showHome()">Home</button>
+  </div>
+  <div class="topics-inner">
+    <div class="topics-header">
+      <h2 id="topics-h2">Select topics</h2>
+      <button type="button" class="btn btn-sm" onclick="selectAll()">Select all</button>
+      <button type="button" class="btn btn-sm" onclick="deselectAll()">Clear</button>
+      <button type="button" class="btn btn-sm" style="border-color:var(--yellow);color:var(--yellow)" onclick="selectWeak()">Weak topics</button>
+    </div>
+    <div class="topic-list" id="topic-list"></div>
+    <div class="topic-type-section">
+      <h3 class="topic-type-heading">Question types</h3>
+      <p class="topic-type-hint">Limit which formats are included.</p>
+      <div class="topic-type-filters">
+        <label class="topic-type-chip"><input type="checkbox" id="qt-mc" checked data-qformat="mc"><span>Multiple choice</span></label>
+        <label class="topic-type-chip"><input type="checkbox" id="qt-tf" checked data-qformat="tf"><span>True / false</span></label>
+        <label class="topic-type-chip"><input type="checkbox" id="qt-id" checked data-qformat="id"><span>Short answer</span></label>
+        <label class="topic-type-chip"><input type="checkbox" id="qt-code" checked data-qformat="code"><span>Code</span></label>
+      </div>
+    </div>
+    <div class="mode-buttons">
+      <button type="button" class="mode-btn" onclick="startMode('all')">All questions</button>
+      <button type="button" class="mode-btn" onclick="startMode('selected')">Selected only</button>
+      <button type="button" class="mode-btn" onclick="startMode('shuffle')">Shuffle all</button>
+      <button type="button" class="mode-btn" onclick="startMode('weak')">Weak only</button>
+      <button type="button" class="mode-btn full" onclick="startMode('exam')">Exam (45 min)</button>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div class="view" id="v-quiz">
+  <div class="quiz-shell">
+    <header class="quiz-topbar">
+      <button type="button" class="btn btn-sm btn-ghost" onclick="confirmEndQuiz()">End</button>
+      <span class="quiz-topbar-title" id="quiz-topbar-title">Quiz</span>
+      <span style="width:48px"></span>
+    </header>
+    <div class="quiz-main">
+      <div class="quiz-body" id="quiz-body">
+        <div class="q-header">
+          <div style="flex:1">
+            <div class="q-meta" id="q-meta"></div>
+            <div class="quiz-progress-track"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+            <div class="quiz-progress-label" id="quiz-progress-label"></div>
+            <div class="q-text" id="q-text" style="margin-top:8px;"></div>
+          </div>
+          <button type="button" class="q-flag" id="flag-btn" onclick="toggleFlag()" aria-label="Flag this question" aria-pressed="false">🚩</button>
+        </div>
+        <div id="q-area"></div>
+        <div id="q-feedback" style="display:none;"></div>
+        <div id="q-confidence" class="confidence-row"></div>
+        <div class="quiz-nav">
+          <button type="button" class="btn" onclick="prevQ()">← Prev</button>
+          <button type="button" class="btn" onclick="skipQ()">Skip (S)</button>
+          <button type="button" class="btn btn-primary" id="next-btn" onclick="nextQ()">Next →</button>
+        </div>
+      </div>
+      <div class="quiz-right" id="quiz-right">
+        <div class="timer-box" id="timer-box" style="display:none;"></div>
+        <div class="sidebar-score">
+          <div class="sc-frac" id="sc-frac">0/0</div>
+          <div class="sc-pct" id="sc-pct">0%</div>
+        </div>
+        <div class="nav-grid" id="nav-grid"></div>
+        <div class="sidebar-kbd"><kbd>→</kbd> next · <kbd>←</kbd> prev · <kbd>S</kbd> skip · <kbd>F</kbd> flag</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div class="view" id="v-result">
+  <div class="topbar">
+    <span class="topbar-title">Result</span>
+    <button type="button" class="btn btn-sm btn-ghost" onclick="showHome()">Home</button>
+  </div>
+  <div class="result-inner">
+    <div class="score-ring-wrap">
+      <svg width="160" height="160" viewBox="0 0 160 160">
+        <circle cx="80" cy="80" r="68" fill="none" stroke="var(--card-border)" stroke-width="14"/>
+        <circle id="ring-fill" cx="80" cy="80" r="68" fill="none" stroke="var(--accent)" stroke-width="14" stroke-linecap="round" stroke-dasharray="427" stroke-dashoffset="427" style="transition:stroke-dashoffset 1s ease;"/>
+      </svg>
+      <div class="score-ring-val"><div class="pct" id="ring-pct">0%</div><div class="label">Score</div></div>
+    </div>
+    <div class="result-stats" id="result-stats"></div>
+    <div class="result-parts" id="result-parts"></div>
+    <div class="session-table-wrap" id="session-table-wrap"></div>
+    <div class="result-buttons">
+      <button type="button" class="btn btn-primary" onclick="showReview()">Review answers</button>
+      <button type="button" class="btn btn-ghost" onclick="retrySession()">Try again</button>
+      <button type="button" class="btn btn-ghost" onclick="showHome()">Home</button>
+    </div>
+  </div>
+</div>
+
+<!-- REVIEW -->
+<div class="view" id="v-review">
+  <div class="topbar">
+    <span class="topbar-title">Answer Review</span>
+    <button class="btn btn-sm btn-ghost" onclick="showResult()">← Back</button>
+  </div>
+  <div id="review-list" style="padding-bottom:40px;"></div>
+</div>
+
+<!-- FLASHCARDS -->
+<div class="view" id="v-flashcards">
+  <div class="topbar">
+    <span class="topbar-title">📇 Flashcards</span>
+    <div class="topbar-actions">
+      <span style="font-size:12px;color:var(--muted)" id="fc-topbar-count"></span>
+      <button type="button" class="btn btn-sm btn-ghost" onclick="showHome()">← Back</button>
+    </div>
+  </div>
+  <div class="fc-body" id="fc-body"></div>
+</div>
+
+<!-- MODULE -->
+<div class="view" id="v-module">
+  <div class="topbar">
+    <span class="topbar-title">📖 Study Module — IT0009</span>
+    <button class="btn btn-sm btn-ghost" onclick="showHome()">← Back</button>
+  </div>
+  <div class="module-content" id="module-content">
+    <div class="mod-cover">
+      <h1>IT0009 Study Guide</h1>
+      <p>Fundamentals of Database Systems with Administration</p>
+      <div class="mod-pills">
+        <span class="mod-pill">PL/SQL Basics</span><span class="mod-pill">Cursors & Records</span>
+        <span class="mod-pill">Exceptions</span><span class="mod-pill">Procedures & Functions</span>
+        <span class="mod-pill">Triggers</span><span class="mod-pill">Data Warehousing</span>
+        <span class="mod-pill">Data Mining</span><span class="mod-pill">Supervised Learning</span>
+        <span class="mod-pill">Unsupervised Learning</span>
+      </div>
+    </div>
+    <div class="mod-toc">
+      <h2>Table of Contents</h2>
+      <ol>
+        <li><a href="#sec1">PL/SQL Block Structure & Control Flow</a></li>
+        <li><a href="#sec2">Cursors & Composite Data Types</a></li>
+        <li><a href="#sec3">Exception Handling</a></li>
+        <li><a href="#sec4">Procedures & Functions</a></li>
+        <li><a href="#sec5">Triggers</a></li>
+        <li><a href="#sec6">Data Warehousing</a></li>
+        <li><a href="#sec7">Data Mining & CRISP-DM</a></li>
+        <li><a href="#sec8">Supervised Learning</a></li>
+        <li><a href="#sec9">Unsupervised Learning</a></li>
+      </ol>
+    </div>
+    <!-- SECTION 1 -->
+    <div class="mod-section" id="sec1">
+      <h2><span class="sec-num">01</span> PL/SQL Block Structure &amp; Control Flow</h2>
+      <div class="analogy-box">
+        <strong>🍳 Analogy</strong>
+        Think of a PL/SQL block like a cooking recipe: <em>DECLARE</em> = your ingredient list, <em>BEGIN</em> = the cooking steps, <em>EXCEPTION</em> = what to do if something burns, <em>END</em> = serve it.
+      </div>
+      <p class="mod-para">Every PL/SQL program is built from <strong>blocks</strong>. A block has up to four sections: DECLARE (variables), BEGIN (logic), EXCEPTION (errors), and END. Only BEGIN and END are mandatory. Anonymous blocks run once; named blocks (procedures, functions) are stored and reused.</p>
+      <div class="mod-code"><pre>DECLARE
+  v_salary  NUMBER;
+  v_name    VARCHAR2(50);
+BEGIN
+  SELECT salary, first_name
+  INTO   v_salary, v_name        -- INTO is MANDATORY
+  FROM   employees
+  WHERE  employee_id = 101;
+
+  DBMS_OUTPUT.PUT_LINE(v_name || ' earns ' || v_salary);
+EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+    DBMS_OUTPUT.PUT_LINE('Employee not found.');
+END;</pre></div>
+      <p class="mod-para"><strong>Implicit Cursor Attributes</strong> — after any DML or SELECT INTO, Oracle populates these automatically:</p>
+      <ul class="key-points">
+        <li><strong>SQL%FOUND</strong> — TRUE if the last statement affected ≥1 row</li>
+        <li><strong>SQL%NOTFOUND</strong> — TRUE if the last statement affected 0 rows</li>
+        <li><strong>SQL%ROWCOUNT</strong> — integer: number of rows affected</li>
+      </ul>
+      <p class="mod-para"><strong>Control Structures:</strong></p>
+      <div class="mod-code"><pre>-- IF
+IF salary > 5000 THEN bonus := 500;
+ELSIF salary > 3000 THEN bonus := 200;
+ELSE bonus := 0;
+END IF;
+
+-- Basic LOOP (must use EXIT WHEN to stop)
+LOOP
+  counter := counter + 1;
+  EXIT WHEN counter > 10;
+END LOOP;
+
+-- WHILE LOOP
+WHILE counter <= 10 LOOP
+  counter := counter + 1;
+END LOOP;
+
+-- FOR LOOP (automatic counter, REVERSE to go backwards)
+FOR i IN 1..10 LOOP
+  DBMS_OUTPUT.PUT_LINE(i);
+END LOOP;</pre></div>
+      <ul class="key-points">
+        <li>DDL statements (CREATE, DROP) CANNOT run in standard PL/SQL — use <strong>EXECUTE IMMEDIATE</strong></li>
+        <li>DML (INSERT, UPDATE, DELETE) and SELECT INTO are fully supported</li>
+        <li>Nested loops use <strong>labels</strong> (&lt;&lt;outer&gt;&gt;) to EXIT a specific level</li>
+      </ul>
+    </div>
+
+    <!-- SECTION 2 -->
+    <div class="mod-section" id="sec2">
+      <h2><span class="sec-num">02</span> Cursors &amp; Composite Data Types</h2>
+      <div class="analogy-box">
+        <strong>👆 Analogy</strong>
+        A cursor is like a bookmark moving through a book. An <em>implicit cursor</em> is automatic (self-checkout). An <em>explicit cursor</em> is manual — you decide when to open, read, and close it.
+      </div>
+      <p class="mod-para">When a query returns multiple rows, you need an <strong>explicit cursor</strong> to process them one at a time. A <strong>%ROWTYPE record</strong> is a shortcut — one variable that holds an entire table row.</p>
+      <div class="mod-code"><pre>DECLARE
+  CURSOR c_emp IS
+    SELECT employee_id, salary FROM employees FOR UPDATE;
+  v_rec c_emp%ROWTYPE;
+BEGIN
+  OPEN c_emp;
+  LOOP
+    FETCH c_emp INTO v_rec;
+    EXIT WHEN c_emp%NOTFOUND;         -- stop when no more rows
+    UPDATE employees
+      SET salary = v_rec.salary * 1.1
+      WHERE CURRENT OF c_emp;         -- update the exact fetched row
+  END LOOP;
+  CLOSE c_emp;
+END;</pre></div>
+      <p class="mod-para">The <strong>Cursor FOR Loop</strong> is the cleanest approach — it auto-opens, auto-fetches, and auto-closes:</p>
+      <div class="mod-code"><pre>FOR rec IN (SELECT * FROM departments) LOOP
+  DBMS_OUTPUT.PUT_LINE(rec.department_name);
+END LOOP;</pre></div>
+      <table class="mod-table">
+        <thead><tr><th>Attribute</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td>%ISOPEN</td><td>TRUE if cursor is currently open</td></tr>
+          <tr><td>%FOUND</td><td>TRUE if last FETCH returned a row</td></tr>
+          <tr><td>%NOTFOUND</td><td>TRUE if last FETCH returned nothing</td></tr>
+          <tr><td>%ROWCOUNT</td><td>Number of rows fetched so far</td></tr>
+        </tbody>
+      </table>
+      <ul class="key-points">
+        <li><strong>FOR UPDATE</strong> — locks rows so no one else can modify them</li>
+        <li><strong>WHERE CURRENT OF cursor</strong> — updates/deletes the exact row just fetched</li>
+        <li><strong>%ROWTYPE</strong> declares a record matching a whole table row</li>
+        <li><strong>TYPE ... IS RECORD</strong> defines a custom record with chosen fields</li>
+      </ul>
+    </div>
+
+    <!-- SECTION 3 -->
+    <div class="mod-section" id="sec3">
+      <h2><span class="sec-num">03</span> Exception Handling</h2>
+      <div class="analogy-box">
+        <strong>🧯 Analogy</strong>
+        Exceptions are like fire extinguishers. Without one, a fire (error) burns down the building (crashes the program). With one, you catch it, handle it, and keep running.
+      </div>
+      <p class="mod-para">The EXCEPTION section catches errors gracefully. It uses <strong>WHEN ... THEN</strong> handlers. <strong>WHEN OTHERS</strong> is the catch-all and must be last.</p>
+      <div class="mod-code"><pre>EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+    DBMS_OUTPUT.PUT_LINE('No rows returned.');
+  WHEN TOO_MANY_ROWS THEN
+    DBMS_OUTPUT.PUT_LINE('Too many rows for SELECT INTO.');
+  WHEN ZERO_DIVIDE THEN
+    DBMS_OUTPUT.PUT_LINE('Division by zero!');
+  WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
+END;</pre></div>
+      <table class="mod-table">
+        <thead><tr><th>Type</th><th>How to use</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td>Predefined</td><td>Use name directly</td><td>NO_DATA_FOUND, TOO_MANY_ROWS, ZERO_DIVIDE</td></tr>
+          <tr><td>Non-Predefined</td><td>DECLARE + PRAGMA EXCEPTION_INIT</td><td>ORA-01400 (cannot insert NULL)</td></tr>
+          <tr><td>User-Defined</td><td>DECLARE + RAISE</td><td>Custom business rules</td></tr>
+        </tbody>
+      </table>
+      <div class="mod-code"><pre>-- Non-predefined: link a name to an Oracle error number
+DECLARE
+  e_null_insert EXCEPTION;
+  PRAGMA EXCEPTION_INIT(e_null_insert, -01400);
+BEGIN
+  INSERT INTO employees(employee_id) VALUES(NULL);
+EXCEPTION
+  WHEN e_null_insert THEN DBMS_OUTPUT.PUT_LINE('Cannot be NULL!');
+END;
+
+-- User-defined: raise your own error
+DECLARE
+  e_too_young EXCEPTION;
+BEGIN
+  IF age < 18 THEN RAISE e_too_young; END IF;
+EXCEPTION
+  WHEN e_too_young THEN DBMS_OUTPUT.PUT_LINE('Must be 18+');
+END;
+
+-- RAISE_APPLICATION_ERROR: range -20000 to -20999
+RAISE_APPLICATION_ERROR(-20001, 'Custom error message here');</pre></div>
+      <ul class="key-points">
+        <li><strong>SQLCODE</strong> — returns the error number (negative for Oracle errors)</li>
+        <li><strong>SQLERRM</strong> — returns the error message text</li>
+        <li>PRAGMA EXCEPTION_INIT is for <em>non-predefined</em> errors, NOT predefined ones</li>
+        <li>Valid range for RAISE_APPLICATION_ERROR: <strong>-20000 to -20999</strong></li>
+      </ul>
+    </div>
+
+    <!-- SECTION 4 -->
+    <div class="mod-section" id="sec4">
+      <h2><span class="sec-num">04</span> Procedures &amp; Functions</h2>
+      <div class="analogy-box">
+        <strong>🔧 Analogy</strong>
+        A <em>procedure</em> is a power drill — it does work. A <em>function</em> is a measuring tape — it does work AND gives you back a number. You can hang a measuring tape inside a blueprint (SQL), but you can't hang a power drill there.
+      </div>
+      <table class="mod-table">
+        <thead><tr><th>Feature</th><th>Procedure</th><th>Function</th></tr></thead>
+        <tbody>
+          <tr><td>Returns value</td><td>No (uses OUT params)</td><td>Yes (RETURN)</td></tr>
+          <tr><td>Use in SQL SELECT</td><td>❌ No</td><td>✅ Yes (if no DML)</td></tr>
+          <tr><td>Invocation</td><td>EXECUTE or BEGIN...END</td><td>expression context</td></tr>
+          <tr><td>Header keyword</td><td>IS / AS (not DECLARE)</td><td>IS / AS + RETURN type</td></tr>
+        </tbody>
+      </table>
+      <div class="mod-code"><pre>-- Procedure
+CREATE OR REPLACE PROCEDURE raise_salary(
+  p_id  IN  employees.employee_id%TYPE,
+  p_pct IN  NUMBER,
+  p_new OUT NUMBER
+) IS
+BEGIN
+  UPDATE employees SET salary = salary * (1 + p_pct/100)
+  WHERE employee_id = p_id;
+  SELECT salary INTO p_new FROM employees WHERE employee_id = p_id;
+END raise_salary;
+
+-- Function (safe for SQL — no DML inside)
+CREATE OR REPLACE FUNCTION get_tax(p_salary NUMBER) RETURN NUMBER IS
+BEGIN
+  RETURN p_salary * 0.12;
+END get_tax;
+
+-- Usage in SQL:
+SELECT first_name, get_tax(salary) FROM employees;</pre></div>
+      <ul class="key-points">
+        <li>Parameters: <strong>IN</strong> (read-only input), <strong>OUT</strong> (write-only output), <strong>IN OUT</strong> (both)</li>
+        <li>Functions with DML (INSERT/UPDATE/DELETE) inside <strong>cannot</strong> be called in SQL context</li>
+        <li><strong>Local subprograms</strong>: procedures/functions defined in another's DECLARE section — scoped locally</li>
+        <li>Benefits of subprograms: Modularity, Reusability, Security, Performance</li>
+      </ul>
+    </div>
+
+    <!-- SECTION 5 -->
+    <div class="mod-section" id="sec5">
+      <h2><span class="sec-num">05</span> Triggers</h2>
+      <div class="analogy-box">
+        <strong>⏰ Analogy</strong>
+        A trigger is like a motion-sensor alarm. It sleeps until something happens (someone enters the room / a row is updated). Then it automatically fires and runs its code.
+      </div>
+      <p class="mod-para">Triggers fire automatically when a DML event occurs on a table or view. You don't call them — Oracle calls them for you.</p>
+      <div class="mod-code"><pre>CREATE OR REPLACE TRIGGER audit_salary
+BEFORE UPDATE OF salary ON employees
+FOR EACH ROW                          -- row-level: fires once per row
+BEGIN
+  IF :NEW.salary < :OLD.salary THEN  -- :OLD = before, :NEW = after
+    RAISE_APPLICATION_ERROR(-20001, 'Salary cannot decrease!');
+  END IF;
+  INSERT INTO salary_audit
+    VALUES(:OLD.employee_id, :OLD.salary, :NEW.salary, SYSDATE);
+END;</pre></div>
+      <table class="mod-table">
+        <thead><tr><th>Feature</th><th>Row-Level (FOR EACH ROW)</th><th>Statement-Level</th></tr></thead>
+        <tbody>
+          <tr><td>Fires</td><td>Once per affected row</td><td>Once per DML command</td></tr>
+          <tr><td>:OLD / :NEW</td><td>✅ Available</td><td>❌ Not available</td></tr>
+          <tr><td>Use case</td><td>Audit each row change</td><td>Log the operation itself</td></tr>
+        </tbody>
+      </table>
+      <ul class="key-points">
+        <li><strong>BEFORE</strong> — fires before DML executes (can prevent the operation)</li>
+        <li><strong>AFTER</strong> — fires after DML executes</li>
+        <li><strong>INSTEAD OF</strong> — replaces DML on a <em>view</em></li>
+        <li><strong>Mutating Table Error</strong> — a row trigger cannot SELECT from the table it is modifying</li>
+        <li>Triggers <strong>cannot receive parameters</strong> — they are event-driven</li>
+        <li>:NEW/:OLD work only in <strong>row-level</strong> triggers</li>
+        <li>Manage: <code>ALTER TRIGGER name DISABLE/ENABLE; DROP TRIGGER name;</code></li>
+      </ul>
+    </div>
+
+    <!-- SECTION 6 -->
+    <div class="mod-section" id="sec6">
+      <h2><span class="sec-num">06</span> Data Warehousing</h2>
+      <div class="analogy-box">
+        <strong>🏛 Analogy</strong>
+        A database is a busy post office processing today's mail. A Data Warehouse is the national archive — it stores every letter ever sent, organized for historical research, not for processing new mail.
+      </div>
+      <p class="mod-para">A <strong>Data Warehouse (DW)</strong> is subject-oriented, integrated, time-variant, and non-volatile. It's designed for analysis (OLAP), not day-to-day transactions (OLTP). Data gets in through the <strong>ETL process</strong>: Extract from sources → Transform (clean, standardize) → Load into the warehouse.</p>
+      <table class="mod-table">
+        <thead><tr><th>Component</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>EDW (Enterprise DW)</td><td>Centralized, enterprise-wide decision support</td></tr>
+          <tr><td>Data Mart</td><td>Department-specific subset of the DW</td></tr>
+          <tr><td>ODS (Operational DS)</td><td>Near real-time operational data, not historical</td></tr>
+        </tbody>
+      </table>
+      <p class="mod-para"><strong>Schema Types:</strong></p>
+      <table class="mod-table">
+        <thead><tr><th>Schema</th><th>Structure</th><th>Dimensions</th></tr></thead>
+        <tbody>
+          <tr><td>Star</td><td>1 Fact table + multiple Dimension tables</td><td>Denormalized (flat)</td></tr>
+          <tr><td>Snowflake</td><td>Star with normalized dimensions</td><td>Normalized (multiple tables)</td></tr>
+          <tr><td>Galaxy</td><td>Multiple Fact tables sharing dimensions</td><td>Mixed</td></tr>
+        </tbody>
+      </table>
+      <ul class="key-points">
+        <li><strong>Fact Table</strong> — contains measurable data (sales amount, quantity)</li>
+        <li><strong>Dimension Table</strong> — provides context (who, what, when, where)</li>
+        <li>Star Schema dimensions are <strong>denormalized</strong> (not normalized)</li>
+        <li>DW is for OLAP (analysis), NOT OLTP (transactions)</li>
+      </ul>
+    </div>
+
+    <!-- SECTION 7 -->
+    <div class="mod-section" id="sec7">
+      <h2><span class="sec-num">07</span> Data Mining &amp; CRISP-DM</h2>
+      <div class="analogy-box">
+        <strong>⛏ Analogy</strong>
+        Data Mining is like panning for gold in a river. The river (data warehouse) has tons of water (raw data) — you pan through it systematically to find gold nuggets (useful patterns).
+      </div>
+      <p class="mod-para"><strong>Data Mining</strong> is the extraction of useful patterns and knowledge from large datasets. It's the analysis step that builds on top of a Data Warehouse.</p>
+      <table class="mod-table">
+        <thead><tr><th>CRISP-DM Phase</th><th>What happens</th></tr></thead>
+        <tbody>
+          <tr><td>1. Business Understanding</td><td>Define the problem and goals</td></tr>
+          <tr><td>2. Data Understanding</td><td>Explore and collect data</td></tr>
+          <tr><td>3. Data Preparation</td><td>Clean, transform, select features</td></tr>
+          <tr><td>4. Modeling</td><td>Apply algorithms (Decision Tree, K-means…)</td></tr>
+          <tr><td>5. Evaluation</td><td>Assess model quality vs. business goals</td></tr>
+          <tr><td>6. Deployment</td><td>Put the model into production</td></tr>
+        </tbody>
+      </table>
+      <table class="mod-table" style="margin-top:14px;">
+        <thead><tr><th>Type</th><th>Also called</th><th>Techniques</th></tr></thead>
+        <tbody>
+          <tr><td>Predictive</td><td>Supervised Learning</td><td>Classification, Regression</td></tr>
+          <tr><td>Descriptive</td><td>Unsupervised Learning</td><td>Clustering, Association</td></tr>
+        </tbody>
+      </table>
+      <ul class="key-points">
+        <li>KDD (Knowledge Discovery in Databases) has <strong>9 steps</strong> including pre-processing, transformation, algorithm selection</li>
+        <li>CRISP-DM has <strong>6 phases</strong> and is the industry standard methodology</li>
+        <li>Data Warehouse = <em>where data lives</em>; Data Mining = <em>how you extract knowledge from it</em></li>
+      </ul>
+    </div>
+
+    <!-- SECTION 8 -->
+    <div class="mod-section" id="sec8">
+      <h2><span class="sec-num">08</span> Supervised Learning</h2>
+      <div class="analogy-box">
+        <strong>🏫 Analogy</strong>
+        Supervised learning is like a teacher grading homework. You show the model examples with correct answers (labeled data), and it learns the pattern to predict future answers.
+      </div>
+      <p class="mod-para">Supervised learning uses <strong>labeled data</strong> — each training example has a known output. The goal is to learn a mapping from input features to output labels.</p>
+      <table class="mod-table">
+        <thead><tr><th>Algorithm</th><th>Key Concept</th><th>Formula/Idea</th></tr></thead>
+        <tbody>
+          <tr><td>Decision Tree (ID3)</td><td>Entropy + Information Gain</td><td>IG = Entropy(S) − Entropy(Attribute)</td></tr>
+          <tr><td>Naïve Bayes</td><td>Probability + Independence</td><td>P(A|B) = P(B|A)×P(A) / P(B)</td></tr>
+          <tr><td>Neural Network (ANN)</td><td>Input → Hidden → Output layers</td><td>Weights + Bias + Activation</td></tr>
+        </tbody>
+      </table>
+      <div class="mod-code"><pre>-- Decision Tree: ID3 Key Concepts
+Entropy(S) = -Σ p_i × log2(p_i)
+-- Perfect split: Entropy = 0
+-- Maximum uncertainty: Entropy = 1
+
+Information Gain = Entropy(S) - Weighted_Entropy(Attribute)
+-- Higher IG → better attribute to split on
+
+-- Example: Entropy(S) = 0.94, Entropy(Outlook) = 0.50
+-- IG = 0.94 - 0.50 = 0.44  ✓</pre></div>
+      <ul class="key-points">
+        <li><strong>Root Node</strong> — topmost decision node (highest IG attribute)</li>
+        <li><strong>Leaf Node</strong> — terminal node with class label (no more splits)</li>
+        <li><strong>Splitting</strong> — dividing data based on an attribute value</li>
+        <li><strong>Pruning</strong> — removing sub-nodes to reduce overfitting (opposite of splitting)</li>
+        <li>Naïve Bayes assumes all features are <strong>independent</strong> of each other</li>
+        <li>Neural Networks: Input Layer → Hidden Layer(s) → Output Layer</li>
+      </ul>
+    </div>
+
+    <!-- SECTION 9 -->
+    <div class="mod-section" id="sec9">
+      <h2><span class="sec-num">09</span> Unsupervised Learning</h2>
+      <div class="analogy-box">
+        <strong>🔍 Analogy</strong>
+        Unsupervised learning is like sorting a pile of foreign coins without knowing the currencies. You group them by size, color, and weight — no labels, just pattern recognition.
+      </div>
+      <p class="mod-para">Unsupervised learning finds hidden structure in <strong>unlabeled data</strong>. There is no correct answer to train against — the algorithm discovers groups or rules on its own.</p>
+      <table class="mod-table">
+        <thead><tr><th>Algorithm</th><th>Type</th><th>Key Concepts</th></tr></thead>
+        <tbody>
+          <tr><td>K-means</td><td>Clustering</td><td>k centroids, iterative assignment until convergence</td></tr>
+          <tr><td>Apriori</td><td>Association Rules</td><td>Support, Confidence, Downward Closure</td></tr>
+        </tbody>
+      </table>
+      <div class="mod-code"><pre>-- K-means Steps:
+1. Choose k (number of clusters)
+2. Initialize k centroids randomly
+3. Assign each point to nearest centroid
+4. Recalculate centroids (mean of each cluster)
+5. Repeat steps 3-4 until centroids stop changing
+
+-- Stopping condition: centroids no longer move (convergence)
+
+-- Apriori Key Measures:
+Support({A,B})    = transactions with A∩B / total transactions
+Confidence(A→B)  = transactions with A∩B / transactions with A
+
+-- Downward Closure Property:
+-- If {A,B} is frequent → {A} and {B} must also be frequent
+-- This allows Apriori to prune infrequent itemsets early</pre></div>
+      <ul class="key-points">
+        <li>K-means is <strong>unsupervised</strong> — it has no labels, only coordinates</li>
+        <li><strong>Support</strong> = how often itemset appears in all transactions</li>
+        <li><strong>Confidence</strong> = P(B | A) — probability of B given A was purchased</li>
+        <li>Apriori's <strong>Downward Closure</strong>: all subsets of a frequent itemset must be frequent</li>
+        <li>K-means stops when centroids <strong>stop changing</strong> (convergence), not after fixed iterations</li>
+      </ul>
+    </div>
+
+  </div><!-- end module-content -->
+</div><!-- end v-module -->
+
+<script>
+// ══════════════════════════════════
+// FLASHCARD DATA — all 50 from PDF
+// ══════════════════════════════════
+const FLASHCARDS = [
+  {id:1,topic:"PL/SQL Basics",q:"What clause is mandatory in a SELECT statement within PL/SQL to hold values?",a:"The INTO clause.",ex:"SELECT...INTO is the only form of SELECT inside PL/SQL. INTO tells Oracle which variable(s) to store the result in."},
+  {id:2,topic:"PL/SQL Basics",q:"What happens if a SELECT INTO returns more than one row?",a:"It raises TOO_MANY_ROWS exception.",ex:"SELECT INTO expects exactly 1 row. >1 row raises TOO_MANY_ROWS; 0 rows raises NO_DATA_FOUND."},
+  {id:3,topic:"PL/SQL Basics",q:"What attribute returns the number of rows affected by the last SQL statement?",a:"SQL%ROWCOUNT.",ex:"SQL%ROWCOUNT is an implicit cursor attribute returning an integer — works on both DML and SELECT INTO."},
+  {id:4,topic:"PL/SQL Basics",q:"What loop guarantees execution at least once?",a:"Basic LOOP (with EXIT WHEN).",ex:"Basic LOOP executes the body first, then checks EXIT WHEN. FOR and WHILE check their condition before executing."},
+  {id:5,topic:"PL/SQL Basics",q:"What keyword reverses a FOR loop counter?",a:"REVERSE.",ex:"FOR i IN REVERSE 10..1 LOOP counts down from 10 to 1. Without REVERSE it counts up."},
+  {id:6,topic:"Cursors & Records",q:"What composite data type groups related data items as fields?",a:"PL/SQL Record.",ex:"A PL/SQL Record holds multiple fields of different types in one variable — like a struct in other languages."},
+  {id:7,topic:"Cursors & Records",q:"What attribute declares a record based on a table's structure?",a:"%ROWTYPE.",ex:"v_rec employees%ROWTYPE declares a record matching every column in the EMPLOYEES table automatically."},
+  {id:8,topic:"Cursors & Records",q:"What are the 4 steps of Explicit Cursor usage?",a:"DECLARE, OPEN, FETCH, CLOSE.",ex:"Declare in the DECLARE section, OPEN to execute the query, FETCH rows one at a time, then CLOSE when done."},
+  {id:9,topic:"Cursors & Records",q:"What cursor attribute checks if a cursor is open?",a:"%ISOPEN.",ex:"cursor_name%ISOPEN returns TRUE if the cursor is currently open, FALSE otherwise."},
+  {id:10,topic:"Cursors & Records",q:"What clause locks rows in a cursor for update?",a:"FOR UPDATE.",ex:"SELECT...FOR UPDATE locks the selected rows so other sessions can't modify them until COMMIT or ROLLBACK."},
+  {id:11,topic:"Cursors & Records",q:"What clause references the current row in an UPDATE within a cursor loop?",a:"WHERE CURRENT OF.",ex:"WHERE CURRENT OF cursor_name targets exactly the row most recently fetched — no primary key WHERE clause needed."},
+  {id:12,topic:"Exceptions",q:"What section handles errors in a PL/SQL block?",a:"EXCEPTION section.",ex:"The EXCEPTION section comes after BEGIN. It uses WHEN...THEN handlers. WHEN OTHERS must be last."},
+  {id:13,topic:"Exceptions",q:"What predefined exception occurs when a SELECT INTO returns no rows?",a:"NO_DATA_FOUND.",ex:"Oracle raises NO_DATA_FOUND automatically when SELECT INTO finds 0 matching rows."},
+  {id:14,topic:"Exceptions",q:"How do you associate a name with a non-predefined Oracle error number?",a:"PRAGMA EXCEPTION_INIT.",ex:"DECLARE e_null EXCEPTION; PRAGMA EXCEPTION_INIT(e_null, -01400); links the name to ORA-01400."},
+  {id:15,topic:"Exceptions",q:"What statement explicitly raises a user-defined exception?",a:"RAISE.",ex:"After declaring 'e_custom EXCEPTION' in DECLARE, raise it with 'RAISE e_custom' inside BEGIN."},
+  {id:16,topic:"Exceptions",q:"What procedure returns user-defined error messages with custom numbers?",a:"RAISE_APPLICATION_ERROR.",ex:"RAISE_APPLICATION_ERROR(-20001, 'message') raises an error with a custom code and message visible to the caller."},
+  {id:17,topic:"Exceptions",q:"What is the valid range for RAISE_APPLICATION_ERROR numbers?",a:"-20000 to -20999.",ex:"Oracle reserves exactly this range for user-defined errors. Numbers outside this range are rejected."},
+  {id:18,topic:"Exceptions",q:"What function returns the error message text?",a:"SQLERRM.",ex:"SQLERRM returns the text of the current Oracle error. SQLCODE returns the error number."},
+  {id:19,topic:"Procedures & Functions",q:"What is a named PL/SQL block that does not return a value directly?",a:"Procedure.",ex:"A Procedure performs an action. It can pass values back using OUT or IN OUT parameters, but has no RETURN clause."},
+  {id:20,topic:"Procedures & Functions",q:"What is a named PL/SQL block that must return a single value?",a:"Function.",ex:"A Function must have a RETURN clause in its header and at least one RETURN statement in its body."},
+  {id:21,topic:"Procedures & Functions",q:"Can a Function be called inside a SQL SELECT statement?",a:"Yes (if it follows restrictions).",ex:"A Function can appear in SQL if it has no DML (INSERT/UPDATE/DELETE) and no COMMIT/ROLLBACK inside it."},
+  {id:22,topic:"Procedures & Functions",q:"Can a Procedure be called inside a SQL SELECT statement?",a:"No.",ex:"Procedures are standalone executable statements. They cannot appear in SQL expressions like SELECT, WHERE, or ORDER BY."},
+  {id:23,topic:"Procedures & Functions",q:"What keyword replaces DECLARE in a Procedure or Function header?",a:"IS or AS.",ex:"Both IS and AS are identical and interchangeable. They mark the beginning of the declaration section."},
+  {id:24,topic:"Procedures & Functions",q:"What is a procedure defined inside another procedure called?",a:"Local Subprogram.",ex:"A Local Subprogram is defined in the DECLARE section of another subprogram. Its scope is limited to that block."},
+  {id:25,topic:"Triggers",q:"What database object fires automatically when an event occurs?",a:"Trigger.",ex:"A Trigger is stored in the database and fires automatically when its triggering event (INSERT, UPDATE, DELETE) occurs."},
+  {id:26,topic:"Triggers",q:"What trigger timing fires before the DML operation?",a:"BEFORE.",ex:"BEFORE triggers fire prior to the DML executing, allowing you to validate or modify :NEW values."},
+  {id:27,topic:"Triggers",q:"What trigger timing fires instead of the DML on a view?",a:"INSTEAD OF.",ex:"INSTEAD OF triggers replace the DML operation on a view. Used to make non-updateable views writable."},
+  {id:28,topic:"Triggers",q:"What qualifier accesses the old value in a row trigger?",a:":OLD.",ex:":OLD holds the column values BEFORE the DML. Available only in row-level (FOR EACH ROW) triggers."},
+  {id:29,topic:"Triggers",q:"What qualifier accesses the new value in a row trigger?",a:":NEW.",ex:":NEW holds the column values AFTER the DML (or incoming values for INSERT). Row-level triggers only."},
+  {id:30,topic:"Triggers",q:"What error occurs when a row trigger queries the table it is firing on?",a:"Mutating Table Error.",ex:"ORA-04091 occurs because the table is in an inconsistent state mid-operation."},
+  {id:31,topic:"Triggers",q:"What statement disables a trigger?",a:"ALTER TRIGGER ... DISABLE.",ex:"ALTER TRIGGER trigger_name DISABLE; temporarily disables it. ALTER TRIGGER trigger_name ENABLE; re-enables it."},
+  {id:32,topic:"Data Warehousing",q:"What is a centralized warehouse providing decision support across an enterprise?",a:"Enterprise Data Warehouse (EDW).",ex:"The EDW integrates data from all enterprise sources into one centralized repository for organization-wide analysis."},
+  {id:33,topic:"Data Warehousing",q:"What is a subset of a data warehouse for a specific business line?",a:"Data Mart.",ex:"A Data Mart serves a specific department (Sales, HR, Finance). Types: Dependent, Independent, Hybrid."},
+  {id:34,topic:"Data Warehousing",q:"What schema has a central fact table connected to dimension tables?",a:"Star Schema.",ex:"Star Schema: one central Fact table surrounded by denormalized Dimension tables. Fast for queries."},
+  {id:35,topic:"Data Warehousing",q:"What schema has normalized dimension tables?",a:"Snowflake Schema.",ex:"Snowflake Schema normalizes dimension tables into multiple related tables. More storage-efficient than Star."},
+  {id:36,topic:"Data Warehousing",q:"What process extracts, transforms, and loads data?",a:"ETL.",ex:"ETL: Extract from sources → Transform (clean, standardize) → Load into the data warehouse."},
+  {id:37,topic:"Data Mining",q:"What is the extraction of vital information from large data sets?",a:"Data Mining.",ex:"Data Mining uses algorithms to find hidden patterns, relationships, and insights in large datasets."},
+  {id:38,topic:"Data Mining",q:"What methodology has 6 phases for data mining projects?",a:"CRISP-DM.",ex:"CRISP-DM: Business Understanding → Data Understanding → Data Preparation → Modeling → Evaluation → Deployment."},
+  {id:39,topic:"Data Mining",q:"What KDD step involves cleaning data?",a:"Pre-processing and cleansing.",ex:"KDD's pre-processing step removes noise, handles missing values, and resolves inconsistencies before mining."},
+  {id:40,topic:"Data Mining",q:"What learning type uses labeled data?",a:"Supervised Learning.",ex:"Supervised learning trains on input-output pairs (labeled examples). The model learns to predict outputs."},
+  {id:41,topic:"Data Mining",q:"What learning type looks for patterns without labels?",a:"Unsupervised Learning.",ex:"Unsupervised learning finds hidden structure in unlabeled data. Examples: K-means, Apriori."},
+  {id:42,topic:"Supervised Learning",q:"What algorithm builds a tree based on Entropy and Information Gain?",a:"ID3 (Decision Tree).",ex:"ID3 selects the attribute with highest Information Gain (IG = Entropy(S) − Entropy(Attribute)) at each node."},
+  {id:43,topic:"Supervised Learning",q:"What measure represents uncertainty in data?",a:"Entropy.",ex:"Entropy = -Σ p_i × log₂(p_i). Entropy=0 means perfectly pure. Entropy=1 means maximum uncertainty."},
+  {id:44,topic:"Supervised Learning",q:"What algorithm assumes independence among predictors?",a:"Naïve Bayes.",ex:"Naïve Bayes applies P(A|B) = P(B|A)×P(A)/P(B) with the assumption that all features are conditionally independent."},
+  {id:45,topic:"Supervised Learning",q:"What layer in a Neural Network processes inputs?",a:"Input Layer.",ex:"Neural Network layers: Input Layer (receives data) → Hidden Layer(s) (processes) → Output Layer (produces result)."},
+  {id:46,topic:"Unsupervised Learning",q:"What algorithm creates k groups from a set of objects?",a:"K-means.",ex:"K-means: 1.Choose k 2.Initialize centroids 3.Assign points 4.Recalculate centroids 5.Repeat until convergence."},
+  {id:47,topic:"Unsupervised Learning",q:"What algorithm learns association rules (e.g., market basket)?",a:"Apriori.",ex:"Apriori finds frequent itemsets and derives association rules like 'customers who buy A also buy B.'"},
+  {id:48,topic:"Unsupervised Learning",q:"What is the probability of item B given item A?",a:"Confidence.",ex:"Confidence(A→B) = P(B|A) = count(A∩B) / count(A). Measures how likely B is when A is purchased."},
+  {id:49,topic:"Unsupervised Learning",q:"What is the number of transactions containing an itemset?",a:"Support.",ex:"Support({A,B}) = count(A∩B) / total_transactions. Measures how frequently the itemset appears."},
+  {id:50,topic:"Unsupervised Learning",q:"What property states all subsets of a frequent itemset must be frequent?",a:"Downward Closure Property.",ex:"If {A,B} is frequent → {A} and {B} must be frequent. Apriori uses this to prune candidate itemsets."},
+];
+
+// ══════════════════════════════════
+// QUESTIONS (unchanged from your file)
+// ══════════════════════════════════
+const QUESTIONS = [
+  {id:1,src:"EXAM",topic:"PL/SQL Basics",type:"mc",q:"Which clause is mandatory when retrieving data into a PL/SQL variable?",opts:["A. FROM","B. WHERE","C. INTO","D. GROUP BY"],ans:2,ex:"INTO is mandatory in a SELECT...INTO statement inside PL/SQL to hold the retrieved value in a variable."},
+  {id:2,src:"EXAM",topic:"PL/SQL Basics",type:"mc",q:"What happens if a SELECT INTO statement returns no rows?",opts:["A. SQL%NOTFOUND becomes TRUE","B. NO_DATA_FOUND exception is raised","C. The variable becomes NULL","D. The program continues silently"],ans:1,ex:"Oracle raises the predefined NO_DATA_FOUND exception when SELECT INTO returns zero rows."},
+  {id:3,src:"EXAM",topic:"PL/SQL Basics",type:"mc",q:"Which loop requires an EXIT WHEN statement to terminate?",opts:["A. FOR Loop","B. WHILE Loop","C. Basic LOOP","D. Cursor FOR Loop"],ans:2,ex:"The basic LOOP has no built-in termination condition — you must provide EXIT WHEN to stop it."},
+  {id:4,src:"EXAM",topic:"Cursors & Records",type:"mc",q:"How do you declare a record that matches the structure of the EMPLOYEES table?",opts:["A. v_rec EMPLOYEES%TYPE;","B. v_rec EMPLOYEES%ROWTYPE;","C. v_rec RECORD EMPLOYEES;","D. v_rec TYPE EMPLOYEES;"],ans:1,ex:"%ROWTYPE creates a record variable whose fields match every column in the referenced table."},
+  {id:5,src:"EXAM",topic:"Cursors & Records",type:"mc",q:"Which cursor attribute returns the total number of rows fetched so far?",opts:["A. %FOUND","B. %ISOPEN","C. %ROWCOUNT","D. %NOTFOUND"],ans:2,ex:"%ROWCOUNT is an integer attribute that tracks the cumulative number of rows fetched or affected."},
+  {id:6,src:"EXAM",topic:"Cursors & Records",type:"mc",q:"What is the purpose of the FOR UPDATE clause in a cursor?",opts:["A. To lock rows for update","B. To update rows immediately","C. To delete rows","D. To commit transactions"],ans:0,ex:"FOR UPDATE places a lock on the selected rows, preventing other sessions from modifying them."},
+  {id:7,src:"EXAM",topic:"Exceptions",type:"mc",q:"Which predefined exception is raised when a SELECT INTO returns more than one row?",opts:["A. NO_DATA_FOUND","B. INVALID_CURSOR","C. TOO_MANY_ROWS","D. ZERO_DIVIDE"],ans:2,ex:"SELECT INTO expects exactly one row. If the query returns multiple rows, Oracle raises TOO_MANY_ROWS."},
+  {id:8,src:"EXAM",topic:"Exceptions",type:"mc",q:"How do you associate a user-defined name with Oracle error -01400?",opts:["A. PRAGMA EXCEPTION_INIT(name, -01400);","B. RAISE_APPLICATION_ERROR(-01400);","C. EXCEPTION_INIT(name, -01400);","D. DECLARE name EXCEPTION -01400;"],ans:0,ex:"PRAGMA EXCEPTION_INIT links a user-declared exception name to a specific Oracle error number."},
+  {id:9,src:"EXAM",topic:"Exceptions",type:"mc",q:"What is the valid range for RAISE_APPLICATION_ERROR numbers?",opts:["A. -20000 to -20999","B. -10000 to -10999","C. 20000 to 20999","D. -2000 to -2999"],ans:0,ex:"Oracle reserves the range -20000 to -20999 exclusively for user-defined application errors."},
+  {id:10,src:"EXAM",topic:"Procedures & Functions",type:"mc",q:"Which subprogram must return a single value?",opts:["A. Procedure","B. Function","C. Trigger","D. Package"],ans:1,ex:"A function is defined with a RETURN clause and must return exactly one value."},
+  {id:11,src:"EXAM",topic:"Procedures & Functions",type:"mc",q:"Can a Procedure be invoked directly in a SQL SELECT statement?",opts:["A. Yes","B. No","C. Only if it has no parameters","D. Only if it returns a value"],ans:1,ex:"Procedures are standalone executable statements. Only functions can appear inside SQL expressions."},
+  {id:12,src:"EXAM",topic:"Procedures & Functions",type:"mc",q:"What keyword is used in a Procedure header instead of DECLARE?",opts:["A. IS or AS","B. BEGIN","C. CREATE","D. RETURN"],ans:0,ex:"In named subprograms, the declaration section begins with IS or AS — not DECLARE."},
+  {id:13,src:"EXAM",topic:"Triggers",type:"mc",q:"When does a BEFORE trigger fire?",opts:["A. After the DML statement completes","B. Before the DML statement executes","C. Instead of the DML statement","D. During commit"],ans:1,ex:"BEFORE triggers fire prior to the DML operation executing, allowing you to validate or modify values."},
+  {id:14,src:"EXAM",topic:"Triggers",type:"mc",q:"Which qualifier refers to the column value before an update in a trigger?",opts:["A. :NEW","B. :OLD","C. :PREVIOUS","D. :CURRENT"],ans:1,ex:":OLD holds the original column values before the triggering DML statement. :NEW holds the new values."},
+  {id:15,src:"EXAM",topic:"Triggers",type:"mc",q:"What error occurs if a row trigger queries the table it is firing on?",opts:["A. Deadlock","B. Mutating Table Error","C. Syntax Error","D. Privilege Error"],ans:1,ex:"A Mutating Table Error (ORA-04091) occurs when a row-level trigger tries to read the table that fired it."},
+  {id:16,src:"EXAM",topic:"Data Warehousing",type:"mc",q:"Which schema type has normalized dimension tables?",opts:["A. Star Schema","B. Snowflake Schema","C. Galaxy Schema","D. Flat Schema"],ans:1,ex:"Snowflake Schema normalizes the dimension tables into multiple related tables, unlike Star Schema."},
+  {id:17,src:"EXAM",topic:"Data Warehousing",type:"mc",q:"What does ETL stand for?",opts:["A. Extract, Transform, Load","B. Enter, Test, Log","C. Extract, Transfer, Load","D. Evaluate, Transform, Load"],ans:0,ex:"ETL (Extract, Transform, Load) is the process of pulling data from source systems and loading into the DW."},
+  {id:18,src:"EXAM",topic:"Data Mining",type:"mc",q:"Which data mining methodology has 6 phases?",opts:["A. KDD","B. CRISP-DM","C. SDLC","D. Agile"],ans:1,ex:"CRISP-DM defines 6 phases: Business Understanding, Data Understanding, Data Preparation, Modeling, Evaluation, Deployment."},
+  {id:19,src:"EXAM",topic:"Supervised Learning",type:"mc",q:"What algorithm uses Entropy and Information Gain?",opts:["A. K-means","B. Apriori","C. ID3 (Decision Tree)","D. Naïve Bayes"],ans:2,ex:"The ID3 algorithm builds a decision tree by selecting the attribute with the highest Information Gain."},
+  {id:20,src:"EXAM",topic:"Unsupervised Learning",type:"mc",q:"In Apriori, what is the probability of Item B given Item A?",opts:["A. Support","B. Confidence","C. Lift","D. Entropy"],ans:1,ex:"Confidence(A→B) = P(B|A) = transactions containing both A and B / transactions containing A."},
+  {id:21,src:"EXAM",topic:"PL/SQL Basics",type:"text-input",q:"Attribute that evaluates to TRUE if the most recent SQL statement returned at least one row.",ans:"SQL%FOUND",hint:"SQL%___",ex:"SQL%FOUND is an implicit cursor attribute that is TRUE when the last DML or SELECT INTO affected at least one row."},
+  {id:22,src:"EXAM",topic:"PL/SQL Basics",type:"text-input",q:"Loop that performs iterative actions based on a counter.",ans:"FOR Loop",hint:"___ Loop",ex:"The FOR Loop automatically manages a counter variable without needing EXIT WHEN."},
+  {id:23,src:"EXAM",topic:"Cursors & Records",type:"text-input",q:"Composite data type consisting of a group of related data items stored as fields.",ans:"PL/SQL Record",hint:"PL/SQL ___",ex:"A PL/SQL Record groups multiple fields of different data types under one variable."},
+  {id:24,src:"EXAM",topic:"Cursors & Records",type:"text-input",q:"Clause used to reference the current row from an explicit cursor in an UPDATE statement.",ans:"WHERE CURRENT OF",hint:"WHERE ___ OF",ex:"WHERE CURRENT OF cursor_name targets the exact row most recently fetched by the cursor."},
+  {id:25,src:"EXAM",topic:"Exceptions",type:"text-input",q:"Procedure used to return user-defined error messages from stored subprograms.",ans:"RAISE_APPLICATION_ERROR",hint:"RAISE_APPLICATION___",ex:"RAISE_APPLICATION_ERROR(-20000 to -20999, 'message') raises a custom error."},
+  {id:26,src:"EXAM",topic:"Procedures & Functions",type:"text-input",q:"A named PL/SQL block that can accept parameters but does not return a value directly.",ans:"Procedure",hint:"Pro___ure",ex:"A Procedure performs an action. It can use OUT or IN OUT parameters, but has no RETURN clause."},
+  {id:27,src:"EXAM",topic:"Triggers",type:"text-input",q:"A trigger that fires once for each row affected by the triggering statement.",ans:"Row-Level Trigger",hint:"___-Level Trigger",ex:"Row-Level Triggers use FOR EACH ROW. They fire once per modified row and have access to :OLD and :NEW."},
+  {id:28,src:"EXAM",topic:"Triggers",type:"text-input",q:"A table that is currently being modified by a DML statement, which cannot be queried in a row trigger.",ans:"Mutating Table",hint:"Mutating ___",ex:"A mutating table is in an intermediate state. Row triggers cannot SELECT from it."},
+  {id:29,src:"EXAM",topic:"Data Warehousing",type:"text-input",q:"A centralized warehouse that provides decision support service across the enterprise.",ans:"Enterprise Data Warehouse",hint:"Enterprise Data ___",ex:"The EDW is the top-level, centralized repository integrating data from all enterprise sources."},
+  {id:30,src:"EXAM",topic:"Data Warehousing",type:"text-input",q:"A subset of the data warehouse designed for a particular line of business.",ans:"Data Mart",hint:"Data ___",ex:"A Data Mart serves a specific department and contains a subset of the enterprise warehouse data."},
+  {id:31,src:"EXAM",topic:"Data Mining",type:"text-input",q:"The process of extracting vital information from a large set of data.",ans:"Data Mining",hint:"Data ___",ex:"Data Mining uses algorithms to uncover patterns, relationships, and insights from large datasets."},
+  {id:32,src:"EXAM",topic:"Supervised Learning",type:"text-input",q:"Learning algorithm that assumes independence among predictors.",ans:"Naïve Bayes",hint:"Naïve ___",ex:"Naïve Bayes applies Bayes' theorem with the assumption that all features are conditionally independent."},
+  {id:33,src:"EXAM",topic:"Unsupervised Learning",type:"text-input",q:"Algorithm that creates k groups from a set of objects (Unsupervised).",ans:"K-means",hint:"K-___",ex:"K-means partitions data into k clusters by iteratively assigning points to the nearest centroid."},
+  {id:34,src:"EXAM",topic:"Supervised Learning",type:"text-input",q:"Measure of the amount of uncertainty or randomness in data.",ans:"Entropy",hint:"En___py",ex:"Entropy is used in ID3. Entropy=0 means perfectly pure; Entropy=1 means maximum uncertainty."},
+  {id:35,src:"EXAM",topic:"Unsupervised Learning",type:"text-input",q:"The number of transactions containing an itemset divided by total transactions.",ans:"Support",hint:"Sup___",ex:"Support measures how frequently an itemset appears in the dataset."},
+  {id:36,src:"EXAM",topic:"PL/SQL Basics",type:"mc",q:"TRUE or FALSE: You can directly execute DDL statements like CREATE TABLE inside a standard PL/SQL block without Dynamic SQL.",opts:["A. True","B. False"],ans:1,ex:"DDL statements require EXECUTE IMMEDIATE (Dynamic SQL) inside PL/SQL."},
+  {id:37,src:"EXAM",topic:"Procedures & Functions",type:"mc",q:"TRUE or FALSE: A Function must contain at least one RETURN statement in the executable section.",opts:["A. True","B. False"],ans:0,ex:"A function must return a value. Without RETURN in the body, Oracle raises an error at runtime."},
+  {id:38,src:"EXAM",topic:"Procedures & Functions",type:"mc",q:"TRUE or FALSE: A Procedure can be called inside a SQL SELECT statement.",opts:["A. True","B. False"],ans:1,ex:"Only functions can appear in SQL expressions. Procedures are standalone statements."},
+  {id:39,src:"EXAM",topic:"Cursors & Records",type:"mc",q:"TRUE or FALSE: Implicit cursors are defined automatically by Oracle for all SQL DML statements.",opts:["A. True","B. False"],ans:0,ex:"Oracle automatically creates an implicit cursor for every SELECT INTO, INSERT, UPDATE, and DELETE."},
+  {id:40,src:"EXAM",topic:"Cursors & Records",type:"mc",q:"TRUE or FALSE: The %ROWCOUNT attribute works only on explicit cursors.",opts:["A. True","B. False"],ans:1,ex:"SQL%ROWCOUNT works on implicit cursors too. After DELETE, SQL%ROWCOUNT gives the number of rows deleted."},
+  {id:41,src:"EXAM",topic:"Cursors & Records",type:"mc",q:"TRUE or FALSE: A Cursor FOR Loop automatically opens, fetches, and closes the cursor.",opts:["A. True","B. False"],ans:0,ex:"The Cursor FOR Loop manages the full cursor lifecycle automatically."},
+  {id:42,src:"EXAM",topic:"Exceptions",type:"mc",q:"TRUE or FALSE: User-defined exceptions must be raised explicitly using the RAISE statement.",opts:["A. True","B. False"],ans:0,ex:"Unlike predefined exceptions, user-defined exceptions must be explicitly RAISEd."},
+  {id:43,src:"EXAM",topic:"Exceptions",type:"mc",q:"TRUE or FALSE: PRAGMA EXCEPTION_INIT is used for predefined exceptions like NO_DATA_FOUND.",opts:["A. True","B. False"],ans:1,ex:"PRAGMA EXCEPTION_INIT is for NON-predefined Oracle errors. Predefined ones already have names."},
+  {id:44,src:"EXAM",topic:"Triggers",type:"mc",q:"TRUE or FALSE: Triggers can receive parameters passed from the calling environment.",opts:["A. True","B. False"],ans:1,ex:"Triggers are event-driven and fire automatically. They cannot accept parameters."},
+  {id:45,src:"EXAM",topic:"Triggers",type:"mc",q:"TRUE or FALSE: :NEW and :OLD qualifiers can be used in statement-level triggers.",opts:["A. True","B. False"],ans:1,ex:":NEW and :OLD are only available in ROW-LEVEL triggers (FOR EACH ROW)."},
+  {id:46,src:"EXAM",topic:"Data Warehousing",type:"mc",q:"TRUE or FALSE: A Data Warehouse is designed for real-time transaction processing (OLTP).",opts:["A. True","B. False"],ans:1,ex:"Data Warehouses are designed for OLAP (analytical queries on historical data), NOT OLTP."},
+  {id:47,src:"EXAM",topic:"Data Warehousing",type:"mc",q:"TRUE or FALSE: Star Schema dimension tables are typically normalized.",opts:["A. True","B. False"],ans:1,ex:"Star Schema dimensions are DENORMALIZED. Snowflake Schema normalizes them."},
+  {id:48,src:"EXAM",topic:"Data Mining",type:"mc",q:"TRUE or FALSE: Supervised learning requires labeled data (known output).",opts:["A. True","B. False"],ans:0,ex:"Supervised learning trains on labeled examples where both input features and correct output labels are provided."},
+  {id:49,src:"EXAM",topic:"Unsupervised Learning",type:"mc",q:"TRUE or FALSE: K-means is a supervised learning algorithm.",opts:["A. True","B. False"],ans:1,ex:"K-means is UNSUPERVISED. It discovers natural groupings without any labeled training data."},
+  {id:50,src:"EXAM",topic:"Supervised Learning",type:"mc",q:"TRUE or FALSE: In Decision Trees, Pruning is the opposite process of Splitting.",opts:["A. True","B. False"],ans:0,ex:"Splitting creates new branches. Pruning removes sub-nodes to simplify the tree and reduce overfitting."},
+  {id:51,src:"EXAM",topic:"PL/SQL Basics",type:"mc",q:"What will happen when this code runs against a table with 100 rows?\n@@CODE@@DECLARE v_sal NUMBER;\nBEGIN\n  SELECT salary INTO v_sal FROM employees;\nEND;@@ENDCODE@@",opts:["A. v_sal holds the average salary","B. ORA-01422: Too many rows","C. v_sal holds the first salary","D. No error"],ans:1,ex:"SELECT INTO expects exactly one row. With 100 rows, Oracle raises ORA-01422 (TOO_MANY_ROWS)."},
+  {id:52,src:"EXAM",topic:"PL/SQL Basics",type:"mc",q:"If 5 rows are deleted, what is the output?\n@@CODE@@BEGIN\n  DELETE FROM employees WHERE department_id = 10;\n  DBMS_OUTPUT.PUT_LINE(SQL%ROWCOUNT);\nEND;@@ENDCODE@@",opts:["A. 5","B. TRUE","C. 10","D. NULL"],ans:0,ex:"SQL%ROWCOUNT returns the integer count of rows affected. After deleting 5 rows, it prints 5."},
+  {id:53,src:"EXAM",topic:"Cursors & Records",type:"mc",q:"What does FOR UPDATE do in this cursor?\n@@CODE@@DECLARE\n  CURSOR c1 IS SELECT * FROM departments FOR UPDATE;\nBEGIN\n  OPEN c1;\n  -- Some logic\n  CLOSE c1;\nEND;@@ENDCODE@@",opts:["A. Updates the rows immediately","B. Locks the rows","C. Deletes the rows","D. Commits the transaction"],ans:1,ex:"FOR UPDATE places a shared lock on the rows returned by the cursor."},
+  {id:54,src:"EXAM",topic:"Exceptions",type:"mc",q:"If a ZERO_DIVIDE error occurs, what is printed?\n@@CODE@@EXCEPTION\n  WHEN NO_DATA_FOUND THEN\n    DBMS_OUTPUT.PUT_LINE('No Data');\n  WHEN OTHERS THEN\n    DBMS_OUTPUT.PUT_LINE('Error');\nEND;@@ENDCODE@@",opts:["A. No Data","B. Error","C. Nothing","D. Program Crashes"],ans:1,ex:"ZERO_DIVIDE does not match NO_DATA_FOUND, so it falls to WHEN OTHERS, which prints 'Error'."},
+  {id:55,src:"EXAM",topic:"Procedures & Functions",type:"mc",q:"Will this function run successfully in a SQL SELECT statement?\n@@CODE@@CREATE FUNCTION get_sal RETURN NUMBER IS\nBEGIN\n  INSERT INTO log_table VALUES (1);\n  RETURN 100;\nEND;@@ENDCODE@@",opts:["A. Yes","B. No — DML not allowed in SQL context","C. Yes, if committed","D. No — missing parameters"],ans:1,ex:"Functions called from SQL SELECT cannot contain DML. Oracle raises an error to prevent side effects."},
+  {id:56,src:"EXAM",topic:"Triggers",type:"mc",q:"What error is likely during execution?\n@@CODE@@CREATE TRIGGER tr1 BEFORE UPDATE ON employees\nFOR EACH ROW\nBEGIN\n  SELECT count(*) INTO v_count FROM employees;\nEND;@@ENDCODE@@",opts:["A. Syntax Error","B. Mutating Table Error","C. Privilege Error","D. No Error"],ans:1,ex:"This row-level trigger queries the EMPLOYEES table while it is being modified — ORA-04091 Mutating Table Error."},
+  {id:57,src:"EXAM",topic:"Exceptions",type:"mc",q:"Will the handler catch the error?\n@@CODE@@DECLARE\n  e_custom EXCEPTION;\n  PRAGMA EXCEPTION_INIT(e_custom, -20001);\nBEGIN\n  RAISE_APPLICATION_ERROR(-20001, 'Custom');\nEXCEPTION\n  WHEN e_custom THEN ...\nEND;@@ENDCODE@@",opts:["A. Yes","B. No — RAISE_APPLICATION_ERROR bypasses DECLARE","C. Yes, but only if raised with RAISE","D. No — wrong number"],ans:0,ex:"RAISE_APPLICATION_ERROR(-20001) raises error with code -20001. PRAGMA EXCEPTION_INIT links e_custom to -20001, so the handler catches it."},
+  {id:58,src:"EXAM",topic:"Supervised Learning",type:"mc",q:"Decision Tree Calculation: If Entropy(S) = 0.94 and Entropy(Attribute) = 0.50, what is the Information Gain?",opts:["A. 0.44","B. 1.44","C. 0.94","D. 0.50"],ans:0,ex:"Information Gain = Entropy(S) − Entropy(Attribute) = 0.94 − 0.50 = 0.44."},
+  {id:59,src:"EXAM",topic:"Unsupervised Learning",type:"mc",q:"K-means Algorithm: What is the stopping condition for K-means?",opts:["A. When centroids stop changing","B. When all points are labeled","C. After 1 iteration","D. When entropy is 0"],ans:0,ex:"K-means converges when centroids no longer move between iterations."},
+  {id:60,src:"EXAM",topic:"Unsupervised Learning",type:"mc",q:"Apriori Algorithm: If {A, B} is frequent, what must also be frequent?",opts:["A. {A} and {B}","B. {C}","C. {A, B, C}","D. Nothing"],ans:0,ex:"The Downward Closure Property: all subsets of a frequent itemset must also be frequent."},
+];
+
+const TOPIC_GROUPS = {
+  EXAM: {
+    "PL/SQL Basics":[1,2,3,21,22,36,51,52],
+    "Cursors & Records":[4,5,6,23,24,39,40,41,53],
+    "Exceptions":[7,8,9,25,42,43,54,57],
+    "Procedures & Functions":[10,11,12,26,37,38,55],
+    "Triggers":[13,14,15,27,28,44,45,56],
+    "Data Warehousing":[16,17,29,30,46,47],
+    "Data Mining":[18,31,48],
+    "Supervised Learning":[19,32,34,37,50,58],
+    "Unsupervised Learning":[20,33,35,49,59,60],
+  }
+};
+
+const REVIEWER_META = {EXAM:{icon:'📋',title:'IT0009 Exam Questionnaire',subtitle:'60 questions — Parts I–IV'}};
+const PART_LABELS = {I:'Part I — Multiple Choice',II:'Part II — Identification',III:'Part III — True/False',IV:'Part IV — Code Analysis',ALL:'All Parts'};
+const PART_CARD_META = {
+  I:{title:'Part I — Multiple Choice',subtitle:'20 questions (MC)'},
+  II:{title:'Part II — Identification',subtitle:'15 questions (short answer)'},
+  III:{title:'Part III — True/False',subtitle:'15 questions (T/F)'},
+  IV:{title:'Part IV — Code Analysis',subtitle:'10 questions (code)'},
+  ALL:{title:'All Parts',subtitle:'Full exam bank — Parts I–IV'}
+};
+const SEGMENT_DEFS = {
+  I:[{id:'all',label:'All MC (20)'},{id:'plsql',label:'PL/SQL (Q1–12)'},{id:'dbm',label:'DB/Mining (Q13–20)'}],
+  II:[{id:'all',label:'All ID (15)'},{id:'plsql',label:'PL/SQL (Q21–28)'},{id:'dbm',label:'DB/Mining (Q29–35)'}],
+  III:[{id:'all',label:'All T/F (15)'},{id:'plsql',label:'PL/SQL (Q36–45)'},{id:'dbm',label:'DB/Mining (Q46–50)'}],
+  IV:[{id:'all',label:'All Code (10)'},{id:'plsql',label:'PL/SQL (Q51–57)'},{id:'dbm',label:'DB/Mining (Q58–60)'}],
+  ALL:[{id:'all',label:'All 60'},{id:'I',label:'Part I'},{id:'II',label:'Part II'},{id:'III',label:'Part III'},{id:'IV',label:'Part IV'}]
+};
+
+// ══════════════════════════════════
+// STATE
+// ══════════════════════════════════
+const SK = 'it0009rev1';
+let S = loadState();
+let session = null;
+let launchPartKey = 'I';
+let launchSegmentKey = 'all';
+let autoAdvanceTimer = null;
+let modalPrevFocus = null;
+
+// Flashcard state
+let fc = {deck:[],index:0,flipped:false,ratings:{},filter:'all'};
+
+function defaultState(){
+  return {topicStats:{},weakIds:[],scoreHistory:[],theme:'light',autoAdvance:false,fcRatings:{}};
+}
+function loadState(){
+  try{ return Object.assign(defaultState(), JSON.parse(localStorage.getItem(SK)||'{}')); }
+  catch(e){ return defaultState(); }
+}
+function saveState(){ localStorage.setItem(SK, JSON.stringify(S)); }
+
+// ══════════════════════════════════
+// THEME
+// ══════════════════════════════════
+function toggleTheme(){
+  S.theme = S.theme==='dark'?'light':'dark';
+  applyTheme(); saveState();
+}
+function applyTheme(){
+  const t = S.theme||'light';
+  document.body.setAttribute('data-theme', t);
+  if(t==='dark') document.body.setAttribute('data-dark','');
+  else document.body.removeAttribute('data-dark');
+  const meta = document.getElementById('meta-theme-color');
+  if(meta) meta.setAttribute('content', t==='dark'?'#12100e':'#f4f1eb');
+}
+applyTheme();
+
+// ══════════════════════════════════
+// VIEWS
+// ══════════════════════════════════
+function showView(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function showHome(){ renderHome(); showView('v-home'); }
+function showTopics(src){ renderTopics(src); showView('v-topics'); window.scrollTo(0,0); }
+function showQuiz(){ showView('v-quiz'); }
+function showResult(){ renderResult(); showView('v-result'); }
+function showReview(){ renderReview(); showView('v-review'); }
+function showModule(){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('v-module').classList.add('active');
+  document.getElementById('module-content').scrollTop = 0;
+}
+function showFlashcards(){
+  fc.ratings = Object.assign({}, S.fcRatings||{});
+  fc.filter = 'all';
+  buildFCDeck();
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('v-flashcards').classList.add('active');
+  renderFC();
+}
+
+// ══════════════════════════════════
+// HOME
+// ══════════════════════════════════
+function renderHome(){
+  const totalQ = QUESTIONS.length;
+  const sessions = S.scoreHistory.length;
+  const best = S.scoreHistory.length ? Math.max(...S.scoreHistory.map(h=>h.pct)) : 0;
+  const weakCount = S.weakIds.length;
+
+  document.getElementById('home-stats').innerHTML = `
+    <div class="stat-box"><div class="stat-val">${totalQ}</div><div class="stat-lbl">Exam Questions</div></div>
+    <div class="stat-box"><div class="stat-val">${FLASHCARDS.length}</div><div class="stat-lbl">Flashcards</div></div>
+    <div class="stat-box"><div class="stat-val">${best?best.toFixed(0)+'%':'—'}</div><div class="stat-lbl">Best Score</div></div>
+    <div class="stat-box"><div class="stat-val">${weakCount}</div><div class="stat-lbl">Weak Questions</div></div>
+  `;
+
+  const cards = document.getElementById('home-cards');
+  let h = '';
+  for(const pk of ['I','II','III','IV','ALL']){
+    const meta = PART_CARD_META[pk];
+    const n = poolForPartCard(pk).length;
+    h += `<div class="reviewer-card" data-part="${pk}" role="button" tabindex="0" onclick="openLaunchModal('${pk}')" onkeydown="cardKeyPart(event,'${pk}')">
+      <div class="card-title">${meta.title}</div>
+      <div class="card-sub">${meta.subtitle}</div>
+      ${partCardStrengthBar(pk)}
+      <div class="card-footer"><span class="part-card-meta">${n} questions</span></div>
+    </div>`;
+  }
+
+  // Flashcard card
+  const fcKnow = Object.values(S.fcRatings||{}).filter(r=>r==='know').length;
+  const fcBadgeTxt = fcKnow>0 ? `${fcKnow}/50 known` : '50 cards';
+  h += `<div class="reviewer-card" data-part="fc" role="button" tabindex="0" onclick="showFlashcards()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showFlashcards();}">
+    <div class="card-title">Flashcards</div>
+    <div class="card-sub">50 Q&amp;A cards from the PDF — flip &amp; self-rate</div>
+    <div class="part-card-bar"><i style="width:${Math.round(fcKnow/50*100)}%"></i></div>
+    <div class="card-footer"><span class="part-card-meta">${fcBadgeTxt}</span></div>
+  </div>`;
+
+  // Study module card
+  h += `<div class="reviewer-card" data-part="mod" role="button" tabindex="0" onclick="showModule()" onkeydown="cardKeyStudy(event)">
+    <div class="card-title">Study module</div>
+    <div class="card-sub">In-depth reading for all course topics — no quiz.</div>
+    <div class="card-footer"><span class="part-card-meta">Open guide</span></div>
+  </div>`;
+
+  cards.innerHTML = h;
+  renderHistoryChart();
+}
+
+function renderHistoryChart(){
+  const wrap = document.getElementById('history-chart');
+  if(!S.scoreHistory.length){ wrap.innerHTML='<div class="no-history">No sessions yet. Start a quiz!</div>'; return; }
+  const last50 = S.scoreHistory.slice(-50);
+  wrap.innerHTML = `<div class="history-bars">${last50.map(h=>{
+    const ht = Math.max(4,(h.pct/100)*60);
+    return `<div class="hbar" style="height:${ht}px"><span class="hbar-tip">${h.pct.toFixed(0)}%</span></div>`;
+  }).join('')}</div>`;
+}
+
+function partCardStrengthBar(pk){
+  const pool = poolForPartCard(pk);
+  if(!pool.length) return '<div class="part-card-bar"></div>';
+  const weak = pool.filter(q=>S.weakIds.includes(q.id)).length;
+  const w = weak===pool.length ? 0 : Math.max(Math.round((1-weak/pool.length)*100), 5);
+  return `<div class="part-card-bar"><i style="width:${w}%"></i></div>`;
+}
+
+// ══════════════════════════════════
+// FLASHCARD ENGINE
+// ══════════════════════════════════
+const FC_FILTER_TABS = [
+  {key:'all',    label:()=>`All (${FLASHCARDS.length})`},
+  {key:'unseen', label:()=>`Unseen (${FLASHCARDS.filter(c=>!fc.ratings[c.id]).length})`},
+  {key:'weak',   label:()=>`Weak (${FLASHCARDS.filter(c=>fc.ratings[c.id]==='nope'||fc.ratings[c.id]==='almost').length})`},
+  {key:'PL/SQL Basics',          label:()=>'PL/SQL'},
+  {key:'Cursors & Records',      label:()=>'Cursors'},
+  {key:'Exceptions',             label:()=>'Exceptions'},
+  {key:'Procedures & Functions', label:()=>'Proc/Func'},
+  {key:'Triggers',               label:()=>'Triggers'},
+  {key:'Data Warehousing',       label:()=>'DW'},
+  {key:'Data Mining',            label:()=>'Mining'},
+  {key:'Supervised Learning',    label:()=>'Supervised'},
+  {key:'Unsupervised Learning',  label:()=>'Unsupervised'},
+];
+
+function buildFCDeck(){
+  const f = fc.filter;
+  if(f==='all') fc.deck = [...FLASHCARDS];
+  else if(f==='unseen') fc.deck = FLASHCARDS.filter(c=>!fc.ratings[c.id]);
+  else if(f==='weak') fc.deck = FLASHCARDS.filter(c=>fc.ratings[c.id]==='nope'||fc.ratings[c.id]==='almost');
+  else fc.deck = FLASHCARDS.filter(c=>c.topic===f);
+  if(!fc.deck.length && f!=='all') fc.deck = [...FLASHCARDS]; // fallback
+  fc.index = 0; fc.flipped = false;
+}
+
+function setFCFilter(key){
+  fc.filter = key;
+  buildFCDeck();
+  renderFC();
+}
+
+function renderFC(){
+  const body = document.getElementById('fc-body');
+  if(!fc.deck.length){ body.innerHTML='<div style="color:var(--muted);text-align:center;padding:40px">No cards.</div>'; return; }
+
+  const card = fc.deck[fc.index];
+  const total = fc.deck.length;
+  const know = Object.values(fc.ratings).filter(r=>r==='know').length;
+  const almost = Object.values(fc.ratings).filter(r=>r==='almost').length;
+  const nope = Object.values(fc.ratings).filter(r=>r==='nope').length;
+  const progPct = Math.round(fc.index/total*100);
+  const curRating = fc.ratings[card.id];
+
+  document.getElementById('fc-topbar-count').textContent = `${fc.index+1}/${total}`;
+
+  // Check if deck complete
+  const allRated = fc.deck.every(c=>fc.ratings[c.id]);
+  if(allRated && fc.index >= total){
+    renderFCComplete(); return;
+  }
+
+  const tabs = FC_FILTER_TABS.map(t=>
+    `<button class="fc-tab${fc.filter===t.key?' active':''}" onclick="setFCFilter('${t.key}')">${escHtml(t.label())}</button>`
+  ).join('');
+
+  const rateDisabled = !fc.flipped && !curRating ? 'disabled' : '';
+
+  body.innerHTML = `
+    <div class="fc-max fc-tabs">${tabs}</div>
+    <div class="fc-max fc-progress-wrap">
+      <div class="fc-progress-label"><span>Card ${fc.index+1} of ${total}</span><span>${progPct}% through</span></div>
+      <div class="fc-progress-track"><div class="fc-progress-fill" style="width:${progPct}%"></div></div>
+    </div>
+    <div class="fc-max fc-stats">
+      <div class="fc-stat s-know"><div class="fsv">${know}</div><div class="fsl">✅ Know it</div></div>
+      <div class="fc-stat s-almost"><div class="fsv">${almost}</div><div class="fsl">🤔 Almost</div></div>
+      <div class="fc-stat s-nope"><div class="fsv">${nope}</div><div class="fsl">❌ Nope</div></div>
+    </div>
+    <div class="fc-max fc-scene">
+      <div class="fc-card-wrap${fc.flipped?' flipped':''}" id="fc-card" onclick="flipFC()">
+        <div class="fc-face">
+          <div class="fc-card-num">#${card.id}</div>
+          <div class="fc-topic-tag">${escHtml(card.topic)}</div>
+          <div class="fc-face-label">Question — tap to reveal</div>
+          <div class="fc-question">${escHtml(card.q)}</div>
+        </div>
+        <div class="fc-face fc-back">
+          <div class="fc-card-num">#${card.id}</div>
+          <div class="fc-topic-tag">${escHtml(card.topic)}</div>
+          <div class="fc-face-label back">Answer</div>
+          <div class="fc-answer">${escHtml(card.a)}</div>
+          <div class="fc-explanation">${escHtml(card.ex)}</div>
+        </div>
+      </div>
+    </div>
+    <div class="fc-max fc-rating">
+      <button class="fc-rate-btn know${curRating==='know'?' selected-rating':''}" onclick="rateFC('know')" ${rateDisabled}>✅ Know it</button>
+      <button class="fc-rate-btn almost${curRating==='almost'?' selected-rating':''}" onclick="rateFC('almost')" ${rateDisabled}>🤔 Almost</button>
+      <button class="fc-rate-btn nope${curRating==='nope'?' selected-rating':''}" onclick="rateFC('nope')" ${rateDisabled}>❌ Nope</button>
+    </div>
+    <div class="fc-max fc-nav">
+      <button class="btn btn-sm btn-ghost" onclick="fcPrev()">← Prev</button>
+      <span style="font-size:12px;color:var(--muted)">${fc.flipped||curRating?'Rate it above':'Tap card to flip'}</span>
+      <button class="btn btn-sm btn-primary" onclick="fcNext()">Next →</button>
+    </div>
+    <div class="fc-max" style="display:flex;gap:8px;justify-content:center">
+      <button class="btn btn-sm btn-ghost" onclick="shuffleFC()">🔀 Shuffle</button>
+      <button class="btn btn-sm btn-ghost" onclick="resetFCRatings()">🗑 Reset ratings</button>
+    </div>
+  `;
+}
+
+function renderFCComplete(){
+  const body = document.getElementById('fc-body');
+  const know = Object.values(fc.ratings).filter(r=>r==='know').length;
+  const almost = Object.values(fc.ratings).filter(r=>r==='almost').length;
+  const nope = Object.values(fc.ratings).filter(r=>r==='nope').length;
+  const total = fc.deck.length;
+  const pct = Math.round(know/total*100);
+  body.innerHTML = `
+    <div class="fc-max fc-complete">
+      <div style="font-size:44px;margin-bottom:12px">${pct>=80?'🏆':pct>=50?'📚':'💪'}</div>
+      <h2>Deck Complete!</h2>
+      <p>You rated all ${total} cards. ${pct>=80?'Excellent mastery!':almost+nope>0?`Review the ${almost+nope} cards you weren't sure about.`:''}</p>
+      <div class="fc-stats" style="margin:16px 0">
+        <div class="fc-stat s-know"><div class="fsv">${know}</div><div class="fsl">✅ Know it</div></div>
+        <div class="fc-stat s-almost"><div class="fsv">${almost}</div><div class="fsl">🤔 Almost</div></div>
+        <div class="fc-stat s-nope"><div class="fsv">${nope}</div><div class="fsl">❌ Nope</div></div>
+      </div>
+      <div class="fc-complete-btns">
+        <button class="btn btn-primary" onclick="fcReviewWeak()">🔁 Review Weak</button>
+        <button class="btn" onclick="fcRestart()">↺ Start Over</button>
+        <button class="btn btn-ghost" onclick="showHome()">🏠 Home</button>
+      </div>
+    </div>`;
+}
+
+function flipFC(){
+  fc.flipped = !fc.flipped;
+  renderFC();
+}
+
+function rateFC(rating){
+  const card = fc.deck[fc.index];
+  fc.ratings[card.id] = rating;
+  S.fcRatings = Object.assign({}, S.fcRatings||{}, {[card.id]: rating});
+  saveState();
+  setTimeout(()=>{
+    fc.flipped = false;
+    if(fc.index < fc.deck.length-1){ fc.index++; renderFC(); }
+    else renderFCComplete();
+  }, 350);
+}
+
+function fcNext(){ fc.flipped=false; if(fc.index<fc.deck.length-1){ fc.index++; renderFC(); } else renderFCComplete(); }
+function fcPrev(){ fc.flipped=false; if(fc.index>0){ fc.index--; renderFC(); } }
+function shuffleFC(){ fc.deck=shuffleArr([...fc.deck]); fc.index=0; fc.flipped=false; renderFC(); toast('Deck shuffled!'); }
+function resetFCRatings(){ if(!confirm('Reset all flashcard ratings?')) return; fc.ratings={}; S.fcRatings={}; saveState(); buildFCDeck(); renderFC(); toast('Ratings reset.'); }
+function fcReviewWeak(){ fc.filter='weak'; buildFCDeck(); fc.index=0; fc.flipped=false; if(!fc.deck.length){toast('No weak cards!');return;} renderFC(); }
+function fcRestart(){ fc.index=0; fc.flipped=false; renderFC(); }
+
+// ══════════════════════════════════
+// MODAL & PART POOLS (from your file, unchanged)
+// ══════════════════════════════════
+function examQs(){ return QUESTIONS.filter(q=>q.src==='EXAM'); }
+function applySegmentToPool(pool, partKey, segKey){
+  if(partKey==='ALL'){
+    if(segKey==='all') return pool;
+    const map={I:[1,20],II:[21,35],III:[36,50],IV:[51,60]};
+    const [lo,hi]=map[segKey]; return pool.filter(q=>q.id>=lo&&q.id<=hi);
+  }
+  const bounds={I:[1,20],II:[21,35],III:[36,50],IV:[51,60]};
+  const [plo,phi]=bounds[partKey];
+  let p=pool.filter(q=>q.id>=plo&&q.id<=phi);
+  if(segKey==='all') return p;
+  const sub={I:{plsql:[1,12],dbm:[13,20]},II:{plsql:[21,28],dbm:[29,35]},III:{plsql:[36,45],dbm:[46,50]},IV:{plsql:[51,57],dbm:[58,60]}}[partKey][segKey];
+  return p.filter(q=>q.id>=sub[0]&&q.id<=sub[1]);
+}
+function getLaunchPool(){
+  const ex=examQs();
+  if(launchPartKey==='ALL') return applySegmentToPool(ex,'ALL',launchSegmentKey);
+  let p=applySegmentToPool(ex,launchPartKey,'all');
+  return applySegmentToPool(p,launchPartKey,launchSegmentKey);
+}
+function poolForPartCard(pk){ return applySegmentToPool(examQs(),pk,'all'); }
+function renderSegmentButtons(){
+  const row=document.getElementById('launch-segments');
+  const defs=SEGMENT_DEFS[launchPartKey];
+  row.innerHTML=defs.map(d=>`<button type="button" class="segment-btn ${d.id===launchSegmentKey?'active':''}" data-seg="${d.id}">${d.label}</button>`).join('');
+  row.querySelectorAll('.segment-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{ launchSegmentKey=btn.getAttribute('data-seg'); renderSegmentButtons(); syncModalRangeMax(); syncModalWeakUi(); });
+  });
+}
+function syncModalRangeMax(){
+  const pool=getLaunchPool(); const el=document.getElementById('modal-q-count');
+  const m=Math.max(1,pool.length); el.max=m;
+  const v=Math.min(parseInt(el.value,10)||m,m); el.value=v;
+  document.getElementById('modal-q-count-lbl').textContent=String(v);
+}
+function syncModalWeakUi(){
+  const pool=getLaunchPool(); const weakN=pool.filter(q=>S.weakIds.includes(q.id)).length;
+  const sel=document.getElementById('modal-session-type'); const weakOpt=sel.querySelector('option[value="weak"]');
+  weakOpt.disabled=weakN===0; if(weakN===0&&sel.value==='weak') sel.value='practice';
+  const isExam=sel.value==='exam'; const sh=document.getElementById('modal-shuffle');
+  sh.disabled=isExam; if(isExam) sh.checked=true;
+  document.getElementById('modal-weak-hint').classList.toggle('show',weakN===0);
+}
+function openLaunchModal(partKey){
+  const overlay=document.getElementById('launch-modal');
+  if(!overlay.classList.contains('open')) modalPrevFocus=document.activeElement instanceof HTMLElement?document.activeElement:null;
+  launchPartKey=partKey; launchSegmentKey='all';
+  document.getElementById('launch-modal-title').textContent=PART_CARD_META[partKey].title;
+  document.getElementById('modal-session-type').value='practice';
+  renderSegmentButtons(); syncModalRangeMax();
+  document.getElementById('modal-auto-advance').checked=!!S.autoAdvance;
+  syncModalWeakUi();
+  overlay.classList.add('open'); overlay.setAttribute('aria-hidden','false');
+  requestAnimationFrame(()=>{ const s=document.getElementById('modal-start-btn'); if(s) s.focus(); });
+}
+function closeLaunchModal(){
+  const overlay=document.getElementById('launch-modal');
+  overlay.classList.remove('open'); overlay.setAttribute('aria-hidden','true');
+  if(modalPrevFocus&&typeof modalPrevFocus.focus==='function') modalPrevFocus.focus();
+  modalPrevFocus=null;
+}
+function cardKeyPart(ev,pk){ if(ev.key!=='Enter'&&ev.key!==' ') return; ev.preventDefault(); openLaunchModal(pk); }
+function cardKeyStudy(ev){ if(ev.key!=='Enter'&&ev.key!==' ') return; ev.preventDefault(); showModule(); }
+function onAutoAdvanceToggle(el){ S.autoAdvance=!!el.checked; saveState(); }
+function clearAutoAdvanceTimer(){ if(autoAdvanceTimer){ clearTimeout(autoAdvanceTimer); autoAdvanceTimer=null; } }
+function launchQuizFromModal(){
+  const pool0=getLaunchPool(); const type=document.getElementById('modal-session-type').value;
+  if(type==='weak'&&!pool0.filter(q=>S.weakIds.includes(q.id)).length) return;
+  S.autoAdvance=document.getElementById('modal-auto-advance').checked; saveState();
+  let pool=[...pool0]; let mode;
+  if(type==='weak'){ mode='weak'; pool=pool.filter(q=>S.weakIds.includes(q.id)); }
+  else if(type==='exam') mode='exam';
+  else mode='all';
+  const shuffleOn=type==='exam'||document.getElementById('modal-shuffle').checked;
+  let questions=shuffleOn?shuffleArr([...pool]):[...pool];
+  const want=parseInt(document.getElementById('modal-q-count').value,10)||questions.length;
+  questions=questions.slice(0,Math.min(want,questions.length));
+  if(!questions.length){ toast('No questions found.'); return; }
+  session={src:'EXAM',mode,partKey:launchPartKey,questions,current:0,answers:new Array(questions.length).fill(null),flags:new Array(questions.length).fill(false),confidences:new Array(questions.length).fill(null),examEnd:mode==='exam'?Date.now()+45*60*1000:null,timer:null};
+  closeLaunchModal(); showQuiz();
+  document.getElementById('quiz-topbar-title').textContent=PART_LABELS[launchPartKey]||'Quiz';
+  renderQuestion(); if(mode==='exam') startTimer();
+}
+function confirmEndQuiz(){
+  if(!session) return;
+  if(!confirm('End this session?')) return;
+  clearAutoAdvanceTimer(); if(session.timer) clearInterval(session.timer); session=null; showHome();
+}
+
+// ══════════════════════════════════
+// TOPICS
+// ══════════════════════════════════
+let currentSrc='EXAM';
+function renderTopics(src){
+  currentSrc=src;
+  document.getElementById('topics-title').textContent='Topic picker';
+  document.getElementById('topics-h2').textContent='Choose topics to include';
+  const groups=TOPIC_GROUPS[src]; const list=document.getElementById('topic-list'); list.innerHTML='';
+  for(const [name,ids] of Object.entries(groups)){
+    const key=`${src}::${name}`; const st=S.topicStats[key]||{correct:0,total:0};
+    const pct=st.total?st.correct/st.total:-1;
+    const cls=pct<0?'prog-none':pct>=.8?'prog-strong':pct>=.5?'prog-fair':'prog-weak';
+    const bCls=pct<0?'tb-none':pct>=.8?'tb-strong':pct>=.5?'tb-fair':'tb-weak';
+    const bLbl=pct<0?'Not started':pct>=.8?'Strong':pct>=.5?'Fair':'Weak';
+    const pctW=pct<0?0:Math.round(pct*100);
+    list.innerHTML+=`<div class="topic-item"><input type="checkbox" id="tp-${name}" checked data-topic="${name}">
+      <label for="tp-${name}">
+        <div style="display:flex;justify-content:space-between;align-items:center"><span class="topic-name">${name}</span><span class="topic-badge ${bCls}">${bLbl}</span></div>
+        <div class="topic-prog-bar"><div class="topic-prog-fill ${cls}" style="width:${pctW}%"></div></div>
+        <span class="topic-stat">${st.total?`${st.correct}/${st.total} correct`:ids.length+' questions'}</span>
+      </label></div>`;
+  }
+}
+function getCheckedTopics(){ return [...document.querySelectorAll('[data-topic]:checked')].map(el=>el.dataset.topic); }
+function selectAll(){ document.querySelectorAll('[data-topic]').forEach(el=>el.checked=true); }
+function deselectAll(){ document.querySelectorAll('[data-topic]').forEach(el=>el.checked=false); }
+function selectWeak(){
+  deselectAll(); const groups=TOPIC_GROUPS[currentSrc];
+  for(const [name] of Object.entries(groups)){
+    const key=`${currentSrc}::${name}`; const st=S.topicStats[key]||{correct:0,total:0};
+    if(!st.total||st.correct/st.total<0.5){ const el=document.querySelector(`[data-topic="${name}"]`); if(el) el.checked=true; }
+  }
+}
+function questionFormat(q){
+  if(q.type==='text-input') return 'id';
+  if(q.type==='mc'){
+    if(/@@CODE@@/.test(q.q)) return 'code';
+    if(q.opts&&q.opts.length===2) return 'tf';
+    return 'mc';
+  }
+  return 'mc';
+}
+function getAllowedQFormats(){
+  const allowed=new Set();
+  document.querySelectorAll('[data-qformat]').forEach(inp=>{ if(inp.checked) allowed.add(inp.getAttribute('data-qformat')); });
+  return allowed;
+}
+function filterPoolByQFormats(pool){
+  const allowed=getAllowedQFormats();
+  if(allowed.size===0){ toast('Choose at least one question type.'); return null; }
+  if(allowed.size===4) return pool;
+  return pool.filter(q=>allowed.has(questionFormat(q)));
+}
+function startMode(mode){
+  const checked=getCheckedTopics(); const groups=TOPIC_GROUPS[currentSrc]; let pool=[];
+  if(mode==='all'||mode==='shuffle'||mode==='exam') pool=QUESTIONS.filter(q=>q.src===currentSrc);
+  else if(mode==='selected'){ const ids=checked.flatMap(t=>groups[t]||[]); pool=QUESTIONS.filter(q=>ids.includes(q.id)); }
+  else if(mode==='weak'){ pool=QUESTIONS.filter(q=>S.weakIds.includes(q.id)&&q.src===currentSrc); if(!pool.length){toast('No weak questions yet!');return;} }
+  pool=filterPoolByQFormats(pool); if(pool===null) return;
+  if(!pool.length){ toast('No questions match those topics and types.'); return; }
+  const setupCount=parseInt(document.getElementById('q-count')||'20',10)||20;
+  const shuffle=mode==='shuffle'||mode==='exam';
+  let questions=shuffle?shuffleArr([...pool]):[...pool];
+  questions=questions.slice(0,Math.min(20,questions.length));
+  session={src:currentSrc,mode,partKey:null,questions,current:0,answers:new Array(questions.length).fill(null),flags:new Array(questions.length).fill(false),confidences:new Array(questions.length).fill(null),examEnd:mode==='exam'?Date.now()+45*60*1000:null,timer:null};
+  showQuiz(); document.getElementById('quiz-topbar-title').textContent=REVIEWER_META[currentSrc]?.title||'Quiz';
+  renderQuestion(); if(mode==='exam') startTimer();
+}
+
+// ══════════════════════════════════
+// QUIZ ENGINE (unchanged)
+// ══════════════════════════════════
+function renderQuestion(){
+  if(!session) return;
+  clearAutoAdvanceTimer();
+  if(!session.confidences) session.confidences=session.questions.map(()=>null);
+  const i=session.current; const q=session.questions[i]; const ans=session.answers[i]; const total=session.questions.length;
+  document.getElementById('q-meta').textContent=`${q.topic}  •  ${partLabel(q)}`;
+  const rem=total-i;
+  document.getElementById('quiz-progress-label').textContent=`Question ${i+1} of ${total} • ${rem} remaining`;
+  document.getElementById('quiz-progress-fill').style.width=total?`${((i+1)/total)*100}%`:'0%';
+  const flagBtn=document.getElementById('flag-btn');
+  flagBtn.classList.toggle('flagged',session.flags[i]);
+  flagBtn.setAttribute('aria-pressed',session.flags[i]?'true':'false');
+  let qhtml=q.q.replace(/@@CODE@@([\s\S]*?)@@ENDCODE@@/g,(_,code)=>`<div class="code-block"><pre>${escHtml(code.trim())}</pre></div>`);
+  document.getElementById('q-text').innerHTML=qhtml;
+  const area=document.getElementById('q-area'); area.innerHTML='';
+  const fb=document.getElementById('q-feedback'); fb.style.display='none';
+  if(q.type==='mc'){
+    area.innerHTML=`<div class="opts-list">${q.opts.map((o,oi)=>`<button type="button" class="opt-btn" onclick="submitMC(${oi})" ${ans!==null?'disabled':''}>${escHtml(o)}</button>`).join('')}</div>`;
+    if(ans!==null){ applyMCFeedback(q,ans); showFeedback(q,ans.correct); }
+  } else if(q.type==='text-input'){
+    area.innerHTML=`<div class="text-input-wrap"><input type="text" id="ti-input" placeholder="Type your answer here…" ${ans!==null?`value="${escAttr(ans.userText||'')}" disabled`:''} onkeydown="if(event.key==='Enter')submitTextInput()">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">${ans===null?`<button type="button" class="btn btn-primary btn-sm" onclick="submitTextInput()">Submit</button>`:''}<button type="button" class="hint-btn" onclick="showHint()">Hint</button></div>
+      <div id="hint-area"></div></div>`;
+    if(ans!==null){ const inp=document.getElementById('ti-input'); if(inp) inp.classList.add(ans.correct?'correct':'wrong'); showFeedback(q,ans.correct); }
+  }
+  paintConfidenceRow(); updateNavGrid(); updateScoreDisplay();
+}
+function paintConfidenceRow(){
+  const confEl=document.getElementById('q-confidence'); if(!session){confEl.classList.remove('visible');confEl.innerHTML='';return;}
+  const i=session.current; const ans=session.answers[i];
+  if(ans===null){confEl.classList.remove('visible');confEl.innerHTML='';return;}
+  if(!session.confidences) session.confidences=session.questions.map(()=>null);
+  confEl.classList.add('visible'); const c=session.confidences[i];
+  if(c) confEl.innerHTML=`<div style="font-size:12px;color:var(--muted)">Confidence: <strong>${c}</strong>/5</div>`;
+  else confEl.innerHTML=`<label class="conf-label" for="conf-sel">Confidence (optional)</label>
+    <select id="conf-sel" class="modal-select conf-select" onchange="setConfidenceFromSelect(this)">
+      <option value="">Choose…</option><option value="1">1 — Low</option><option value="2">2</option>
+      <option value="3">3 — Medium</option><option value="4">4</option><option value="5">5 — High</option>
+    </select>`;
+}
+function setConfidenceFromSelect(el){
+  const v=el.value; if(!session||v==='') return;
+  const i=session.current; if(!session.confidences) session.confidences=session.questions.map(()=>null);
+  session.confidences[i]=parseInt(v,10); paintConfidenceRow();
+}
+function partLabel(q){ if(q.id<=20) return 'Part I — MC'; if(q.id<=35) return 'Part II — Identification'; if(q.id<=50) return 'Part III — True/False'; return 'Part IV — Code Analysis'; }
+function submitMC(chosen){
+  const i=session.current; const q=session.questions[i]; const correct=chosen===q.ans;
+  session.answers[i]={chosen,correct}; recordResult(q,correct); applyMCFeedback(q,{chosen,correct}); showFeedback(q,correct); paintConfidenceRow();
+  if(q.type==='mc'&&S.autoAdvance){ clearAutoAdvanceTimer(); autoAdvanceTimer=setTimeout(()=>{autoAdvanceTimer=null;if(session)nextQ();},1500); }
+}
+function applyMCFeedback(q,ans){
+  document.querySelectorAll('.opt-btn').forEach((btn,bi)=>{
+    btn.disabled=true; if(bi===q.ans) btn.classList.add('correct'); else if(bi===ans.chosen&&!ans.correct) btn.classList.add('wrong');
+  });
+}
+function submitTextInput(){
+  const i=session.current; const q=session.questions[i]; const inp=document.getElementById('ti-input'); if(!inp) return;
+  const userText=inp.value.trim(); if(!userText){toast('Type an answer first!');return;}
+  const correct=normalize(userText)===normalize(q.ans);
+  session.answers[i]={userText,correct}; inp.disabled=true; inp.classList.add(correct?'correct':'wrong');
+  recordResult(q,correct); showFeedback(q,correct); renderQuestion();
+}
+function normalize(s){ return s.toLowerCase().replace(/[^a-z0-9%]/g,'').trim(); }
+function showHint(){ const q=session.questions[session.current]; const area=document.getElementById('hint-area'); if(area) area.innerHTML=`<div class="hint-box">💡 Hint: <strong>${escHtml(q.hint||'No hint available')}</strong></div>`; }
+function showFeedback(q,correct){
+  const fb=document.getElementById('q-feedback'); const ansText=q.type==='text-input'?q.ans:q.opts[q.ans];
+  fb.style.display='block'; fb.className='feedback-box '+(correct?'correct':'wrong');
+  fb.innerHTML=`<div class="fb-label">${correct?'✅ Correct!':'❌ Wrong'}</div><div class="fb-ans">Answer: ${escHtml(ansText)}</div><div class="fb-ex">${escHtml(q.ex)}</div>`;
+}
+function recordResult(q,correct){
+  if(!correct){if(!S.weakIds.includes(q.id))S.weakIds.push(q.id);}else{S.weakIds=S.weakIds.filter(id=>id!==q.id);}
+  recordTopicStat(q,correct); saveState();
+}
+function recordTopicStat(q,correct){
+  const key=`${q.src}::${q.topic}`; if(!S.topicStats[key])S.topicStats[key]={correct:0,total:0};
+  S.topicStats[key].total++; if(correct)S.topicStats[key].correct++;
+}
+function nextQ(){ clearAutoAdvanceTimer(); if(session.current<session.questions.length-1){session.current++;renderQuestion();}else{finishSession();} }
+function prevQ(){ clearAutoAdvanceTimer(); if(session.current>0){session.current--;renderQuestion();} }
+function skipQ(){ nextQ(); }
+function toggleFlag(){ session.flags[session.current]=!session.flags[session.current]; const flagBtn=document.getElementById('flag-btn'); flagBtn.classList.toggle('flagged',session.flags[session.current]); flagBtn.setAttribute('aria-pressed',session.flags[session.current]?'true':'false'); updateNavGrid(); }
+function updateNavGrid(){
+  const grid=document.getElementById('nav-grid');
+  grid.innerHTML=session.questions.map((q,i)=>{
+    let cls='nc-default'; if(i===session.current) cls='nc-current'; else if(session.answers[i]!==null) cls=session.answers[i].correct?'nc-correct':'nc-wrong';
+    const flag=session.flags[i]?' nc-flagged':'';
+    return `<button type="button" class="nav-cell ${cls}${flag}" onclick="jumpTo(${i})">${i+1}</button>`;
+  }).join('');
+}
+function jumpTo(i){ session.current=i; renderQuestion(); }
+function updateScoreDisplay(){
+  const answered=session.answers.filter(a=>a!==null); const correct=answered.filter(a=>a.correct).length; const total=answered.length; const pct=total?Math.round(correct/total*100):0;
+  document.getElementById('sc-frac').textContent=`${correct}/${total}`; document.getElementById('sc-pct').textContent=`${pct}%`;
+}
+function startTimer(){
+  const box=document.getElementById('timer-box'); box.style.display='block';
+  session.timer=setInterval(()=>{
+    const rem=Math.max(0,session.examEnd-Date.now()); const m=Math.floor(rem/60000); const s=Math.floor((rem%60000)/1000);
+    box.textContent=`⏱ ${m}:${s.toString().padStart(2,'0')}`;
+    box.className='timer-box'+(rem<300000?' timer-warn':'')+(rem<180000?' timer-crit':'');
+    if(rem<=0){clearInterval(session.timer);finishSession();}
+  },1000);
+}
+function finishSession(){
+  clearAutoAdvanceTimer(); if(session.timer)clearInterval(session.timer);
+  const answered=session.answers.filter(a=>a!==null); const correct=answered.filter(a=>a.correct).length;
+  const pct=session.questions.length?correct/session.questions.length*100:0;
+  S.scoreHistory.push({src:session.src,pct,date:Date.now()}); if(S.scoreHistory.length>50)S.scoreHistory.shift();
+  saveState(); showResult();
+}
+
+// ══════════════════════════════════
+// RESULT
+// ══════════════════════════════════
+function partKeyForId(id){ if(id<=20)return 'I'; if(id<=35)return 'II'; if(id<=50)return 'III'; return 'IV'; }
+function renderResult(){
+  if(!session) return;
+  const total=session.questions.length; const correct=session.answers.filter(a=>a&&a.correct).length; const pct=total?correct/total*100:0;
+  const ringWrap=document.querySelector('.score-ring-wrap'); ringWrap.classList.remove('ring-glow-high','ring-glow-low');
+  if(pct>=80) ringWrap.classList.add('ring-glow-high'); else if(pct<50) ringWrap.classList.add('ring-glow-low');
+  document.getElementById('ring-pct').textContent=Math.round(pct)+'%';
+  const circ=2*Math.PI*68;
+  setTimeout(()=>{ document.getElementById('ring-fill').style.strokeDashoffset=circ*(1-pct/100); document.getElementById('ring-fill').style.stroke=pct>=80?'var(--green)':pct>=50?'var(--yellow)':'var(--red)'; },100);
+  const skipped=session.answers.filter(a=>a===null).length;
+  document.getElementById('result-stats').innerHTML=`
+    <div class="result-stat"><div class="val" style="color:var(--green)">${correct}</div><div class="lbl">Correct</div></div>
+    <div class="result-stat"><div class="val" style="color:var(--red)">${total-correct-skipped}</div><div class="lbl">Wrong</div></div>
+    <div class="result-stat"><div class="val" style="color:var(--muted)">${skipped}</div><div class="lbl">Skipped</div></div>
+    <div class="result-stat"><div class="val">${total}</div><div class="lbl">Total</div></div>`;
+  const byPart={I:{c:0,t:0},II:{c:0,t:0},III:{c:0,t:0},IV:{c:0,t:0}};
+  session.questions.forEach((q,idx)=>{ const pk=partKeyForId(q.id); byPart[pk].t++; const a=session.answers[idx]; if(a&&a.correct)byPart[pk].c++; });
+  document.getElementById('result-parts').innerHTML=`<h4>By part</h4><ul>${['I','II','III','IV'].map(pk=>{const b=byPart[pk];if(!b.t)return`<li>Part ${pk}: (not in session)</li>`;return`<li>Part ${pk}: ${b.c}/${b.t} correct</li>`;}).join('')}</ul>`;
+  const confs=session.confidences||[];
+  const rows=session.questions.map((q,i)=>{ const a=session.answers[i]; const icon=a===null?'⏭':a.correct?'✅':'❌'; const cf=confs[i]?`${confs[i]}/5`:'—'; return `<tr><td>Q${q.id}</td><td>${escHtml(q.topic)}</td><td>${icon}</td><td>${cf}</td></tr>`; }).join('');
+  document.getElementById('session-table-wrap').innerHTML=`<table class="session-table"><thead><tr><th>Q#</th><th>Topic</th><th>Result</th><th>Confidence</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+function retrySession(){ if(!session) return; showTopics(session.src); }
+
+// ══════════════════════════════════
+// REVIEW
+// ══════════════════════════════════
+function renderReview(){
+  if(!session) return;
+  const list=document.getElementById('review-list');
+  list.innerHTML=`<div style="padding:16px 20px;font-size:13px;color:var(--muted)">${session.questions.length} questions reviewed</div>`;
+  session.questions.forEach((q,i)=>{
+    const ans=session.answers[i]; const correct=ans?.correct; const cls=ans===null?'':correct?'ri-correct':'ri-wrong'; const icon=ans===null?'⬜':correct?'✅':'❌';
+    let userAns='Skipped'; if(ans!==null){ if(q.type==='text-input') userAns=`"${ans.userText}"`; else if(q.opts) userAns=q.opts[ans.chosen]; }
+    let qhtml=q.q.replace(/@@CODE@@([\s\S]*?)@@ENDCODE@@/g,(_,code)=>`<div class="code-block" style="margin:8px 0"><pre>${escHtml(code.trim())}</pre></div>`);
+    list.innerHTML+=`<div class="review-item ${cls}"><div class="review-q">${icon} <strong>Q${q.id}.</strong> ${qhtml}</div>
+      <div class="review-ans" style="color:var(--muted)">Your answer: <em>${escHtml(userAns)}</em></div>
+      <div class="review-ans" style="color:var(--green)">Correct: <em>${escHtml(q.type==='text-input'?q.ans:q.opts?.[q.ans]||'')}</em></div>
+      <div class="review-ex">${escHtml(q.ex)}</div></div>`;
+  });
+}
+
+// ══════════════════════════════════
+// UTILS
+// ══════════════════════════════════
+function shuffleArr(arr){ for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];} return arr; }
+function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escAttr(s){ return escHtml(s); }
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2200); }
+function clearAll(){ if(!confirm('Reset all progress? This cannot be undone.')) return; S=defaultState(); saveState(); renderHome(); toast('Progress reset.'); }
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){ const m=document.getElementById('launch-modal'); if(m&&m.classList.contains('open')) closeLaunchModal(); }
+  // Flashcard shortcuts
+  if(document.getElementById('v-flashcards').classList.contains('active')){
+    if(e.key===' '){ e.preventDefault(); flipFC(); }
+    else if(e.key==='ArrowRight') fcNext();
+    else if(e.key==='ArrowLeft') fcPrev();
+    else if(e.key==='1') rateFC('know');
+    else if(e.key==='2') rateFC('almost');
+    else if(e.key==='3') rateFC('nope');
+    return;
+  }
+  // Quiz shortcuts
+  if(!session) return;
+  if(['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
+  if(e.key==='ArrowRight') nextQ(); else if(e.key==='ArrowLeft') prevQ(); else if(e.key==='s'||e.key==='S') skipQ(); else if(e.key==='f'||e.key==='F') toggleFlag();
+});
+
+window.addEventListener('beforeunload',e=>{ if(session&&document.getElementById('v-quiz').classList.contains('active')){ e.preventDefault(); e.returnValue=''; } });
+
+(function initModalTabTrap(){
+  const modal=document.getElementById('launch-modal');
+  modal.addEventListener('keydown',e=>{
+    if(!modal.classList.contains('open')||e.key!=='Tab') return;
+    const nodes=[...modal.querySelectorAll('.modal-box button:not([disabled]),.modal-box select:not([disabled]),.modal-box input[type=checkbox]')].filter(n=>n.offsetParent!==null);
+    if(!nodes.length) return;
+    const first=nodes[0],last=nodes[nodes.length-1];
+    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+  });
+})();
+
+renderHome();
+</script>
+</body>
+</html>
